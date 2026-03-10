@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Сбор на бутылку</title>
-    <!-- 🔥 VK BRIDGE SDK -->
-    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -47,9 +45,9 @@
             overflow: hidden;
             position: relative;
             margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);            border: 2px solid #d1d1d1;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid #d1d1d1;
         }
-
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #22c55e, #4ade80);
@@ -84,19 +82,26 @@
 
         .buttons {
             display: flex;
-            gap: 20px;
+            flex-direction: column;
+            gap: 15px;
             justify-content: center;
             margin-bottom: 20px;
         }
 
+        .button-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
         .btn {
             width: 80px;
-            height: 80px;
-            border: none;
+            height: 80px;            border: none;
             border-radius: 50%;
-            font-size: 2em;
+            font-size: 1.5em;
             font-weight: bold;
-            cursor: pointer;            transition: transform 0.1s;
+            cursor: pointer;
+            transition: transform 0.1s;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
@@ -104,13 +109,23 @@
             transform: scale(0.95);
         }
 
-        .btn-minus {
+        .btn-minus-1 {
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
         }
 
-        .btn-plus {
+        .btn-plus-1 {
             background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+
+        .btn-minus-10 {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white;
+        }
+
+        .btn-plus-10 {
+            background: linear-gradient(135deg, #a855f7, #9333ea);
             color: white;
         }
 
@@ -120,58 +135,78 @@
             font-size: 0.9em;
             margin-top: 20px;
         }
+
+        #loading {
+            text-align: center;
+            color: #666;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <h1>💰 Сбор на бутылку Владу</h1>
-    
-    <div class="container">
+        <div class="container">
         <div class="progress-container">
             <div class="progress-fill" id="progressFill"></div>
-            <div class="progress-text" id="progressText">0₽</div>
+            <div class="progress-text" id="progressText">Загрузка...</div>
         </div>
 
         <div class="buttons">
-            <button class="btn btn-minus" onclick="changeAmount(-1)">−</button>
-            <button class="btn btn-plus" onclick="changeAmount(1)">+</button>
+            <!-- Кнопки по 10₽ -->
+            <div class="button-row">
+                <button class="btn btn-minus-10" onclick="changeAmount(-10)">−10</button>
+                <button class="btn btn-plus-10" onclick="changeAmount(10)">+10</button>
+            </div>
+
+            <!-- Кнопки по 1₽ -->
+            <div class="button-row">
+                <button class="btn btn-minus-1" onclick="changeAmount(-1)">−</button>
+                <button class="btn btn-plus-1" onclick="changeAmount(1)">+</button>
+            </div>
         </div>
 
         <div class="info">
             Цель: 1000₽ | Макс: 11111₽<br>
-            <span id="status">Нажми + или -</span>
+            <span id="status">Общий сбор</span>
         </div>
+        
+        <div id="loading">🔄 Синхронизация...</div>
     </div>
 
-    <script>
-        // 🔥 VK BRIDGE INITIALIZATION
-        let vkBridgeReady = false;
-        window.addEventListener('load', () => {
-            // Инициализация VK Bridge
-            vkBridge.send('VKWebAppInit')
-                .then(() => {
-                    vkBridgeReady = true;
-                    console.log('VK Bridge initialized');
-                    
-                    // Устанавливаем цвета
-                    vkBridge.send('VKWebAppSetViewSettings', {
-                        status_bar_style: 'light',
-                        action_bar_color: '#ffffff'
-                    });
-                })
-                .catch((error) => {
-                    console.log('VK Bridge init error:', error);
-                    // Если ошибка - всё равно показываем приложение
-                    vkBridgeReady = true;
-                });
-        });
+    <!-- 🔥 FIREBASE SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-        // Переменные приложения
-        let currentAmount = 0;
-        const targetAmount = 1000;
+    <script>
+        // 🔥 ВСТАВЬ СЮДА СВОЙ КОНФИГ ИЗ FIREBASE
+        const firebaseConfig = {
+            apiKey: "СЮДА_ВСТАВИТЬ_apiKey",
+            authDomain: "СЮДА_ВСТАВИТЬ_authDomain",
+            databaseURL: "СЮДА_ВСТАВИТЬ_databaseURL",
+            projectId: "СЮДА_ВСТАВИТЬ_projectId",
+            storageBucket: "СЮДА_ВСТАВИТЬ_storageBucket",
+            messagingSenderId: "СЮДА_ВСТАВИТЬ_messagingSenderId",
+            appId: "СЮДА_ВСТАВИТЬ_appId"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Переменные
+        let currentAmount = 0;        const targetAmount = 1000;
         const negativeMax = 11111;
-        const step = 1;
         const maxDisplay = 11111;
 
+        // Чтение данных из Firebase
+        db.ref('bottleAmount').on('value', (snapshot) => {
+            const data = snapshot.val();
+            currentAmount = data !== null ? data : 0;
+            updateDisplay();
+            document.getElementById('loading').style.display = 'none';
+        });
+
+        // Форматирование числа
         function formatNumber(num) {
             if (num >= maxDisplay) {
                 return '∞';
@@ -182,6 +217,7 @@
             }
         }
 
+        // Обновление отображения
         function updateDisplay() {
             const progressFill = document.getElementById('progressFill');
             const progressText = document.getElementById('progressText');
@@ -194,7 +230,8 @@
             if (currentAmount >= targetAmount) {
                 percentage = 100;
             } else if (currentAmount <= 0) {
-                percentage = 0;            } else {
+                percentage = 0;
+            } else {
                 percentage = (currentAmount / targetAmount) * 100;
             }
 
@@ -206,57 +243,35 @@
             } else if (currentAmount < targetAmount) {
                 progressFill.classList.remove('negative');
                 status.textContent = '📈 Осталось: ' + (targetAmount - currentAmount) + '₽';
-            } else if (currentAmount >= maxDisplay) {
-                status.textContent = '🚀 БЕСКОНЕЧНОСТЬ!';
+            } else if (currentAmount >= maxDisplay) {                status.textContent = '🚀 БЕСКОНЕЧНОСТЬ!';
             } else {
                 progressFill.classList.remove('negative');
                 status.textContent = '✅ Цель достигнута! +' + (currentAmount - targetAmount) + '₽';
             }
 
             progressFill.style.width = percentage + '%';
-
-            localStorage.setItem('bottleAmount', currentAmount);
         }
 
+        // Изменение суммы
         function changeAmount(delta) {
-            currentAmount += delta * step;
-            updateDisplay();
+            const newAmount = currentAmount + delta;
             
+            // Ограничения
+            if (newAmount > 11111 || newAmount < -11111) {
+                return;
+            }
+
+            // Запись в Firebase
+            db.ref('bottleAmount').set(newAmount)
+                .then(() => {
+                    console.log('Updated:', newAmount);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+
             if (navigator.vibrate) {
                 navigator.vibrate(50);
-            }
-        }
-
-        window.onload = function() {
-            const saved = localStorage.getItem('bottleAmount');
-            if (saved !== null) {
-                currentAmount = parseInt(saved);
-            }
-            updateDisplay();
-        };
-
-        // Свайпы
-        let touchStartX = 0;
-        let touchEndX = 0;
-
-        document.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-
-        document.addEventListener('touchend', e => {            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        });
-
-        function handleSwipe() {
-            const swipeThreshold = 50;
-            const diff = touchStartX - touchEndX;
-            
-            if (Math.abs(diff) > swipeThreshold) {
-                if (diff > 0) {
-                    changeAmount(10);
-                } else {
-                    changeAmount(-10);
-                }
             }
         }
     </script>
