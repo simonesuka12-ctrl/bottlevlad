@@ -2,18 +2,21 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Сбор на бутылку</title>
+    <!-- 🔥 VK BRIDGE SDK -->
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             background: #ffffff;
             color: #1a1a1a;
             min-height: 100vh;
@@ -44,9 +47,9 @@
             overflow: hidden;
             position: relative;
             margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border: 2px solid #d1d1d1;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);            border: 2px solid #d1d1d1;
         }
+
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #22c55e, #4ade80);
@@ -93,10 +96,10 @@
             border-radius: 50%;
             font-size: 2em;
             font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.1s;
+            cursor: pointer;            transition: transform 0.1s;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
+
         .btn:active {
             transform: scale(0.95);
         }
@@ -140,11 +143,35 @@
     </div>
 
     <script>
+        // 🔥 VK BRIDGE INITIALIZATION
+        let vkBridgeReady = false;
+        window.addEventListener('load', () => {
+            // Инициализация VK Bridge
+            vkBridge.send('VKWebAppInit')
+                .then(() => {
+                    vkBridgeReady = true;
+                    console.log('VK Bridge initialized');
+                    
+                    // Устанавливаем цвета
+                    vkBridge.send('VKWebAppSetViewSettings', {
+                        status_bar_style: 'light',
+                        action_bar_color: '#ffffff'
+                    });
+                })
+                .catch((error) => {
+                    console.log('VK Bridge init error:', error);
+                    // Если ошибка - всё равно показываем приложение
+                    vkBridgeReady = true;
+                });
+        });
+
+        // Переменные приложения
         let currentAmount = 0;
-        const targetAmount = 1000;      // 🔥 Цель сбора
-        const negativeMax = 11111;      // 🔥 Максимум в минус
+        const targetAmount = 1000;
+        const negativeMax = 11111;
         const step = 1;
-        const maxDisplay = 11111;       // 🔥 Максимум в плюс
+        const maxDisplay = 11111;
+
         function formatNumber(num) {
             if (num >= maxDisplay) {
                 return '∞';
@@ -167,12 +194,10 @@
             if (currentAmount >= targetAmount) {
                 percentage = 100;
             } else if (currentAmount <= 0) {
-                percentage = 0;
-            } else {
+                percentage = 0;            } else {
                 percentage = (currentAmount / targetAmount) * 100;
             }
 
-            // КРАСНАЯ ПОЛОСКА СПРАВА
             if (currentAmount < 0) {
                 percentage = (Math.abs(currentAmount) / negativeMax) * 100;
                 percentage = Math.min(100, percentage);
@@ -194,7 +219,8 @@
         }
 
         function changeAmount(delta) {
-            currentAmount += delta * step;            updateDisplay();
+            currentAmount += delta * step;
+            updateDisplay();
             
             if (navigator.vibrate) {
                 navigator.vibrate(50);
@@ -217,8 +243,7 @@
             touchStartX = e.changedTouches[0].screenX;
         });
 
-        document.addEventListener('touchend', e => {
-            touchEndX = e.changedTouches[0].screenX;
+        document.addEventListener('touchend', e => {            touchEndX = e.changedTouches[0].screenX;
             handleSwipe();
         });
 
