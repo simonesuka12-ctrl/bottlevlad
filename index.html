@@ -8,7 +8,56 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #ffffff; color: #1a1a1a; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         h1 { margin-bottom: 20px; text-align: center; font-size: 1.5em; color: #1a1a1a; }
-        .login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; width: 100%; max-width: 400px; }
+        
+        /* 🎬 ЭКРАН ЗАГРУЗКИ */
+        .loading-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100%;
+            max-width: 400px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: white;
+            z-index: 10000;
+        }
+        .loading-title {
+            font-size: 1.5em;
+            margin-bottom: 40px;
+            text-align: center;
+            color: #1a1a1a;
+        }
+        .loading-bar-container {
+            width: 80%;
+            height: 40px;
+            background: #e5e5e5;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid #d1d1d1;
+        }
+        .loading-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #4ade80);
+            width: 0%;
+            transition: width 0.3s ease-out;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+        }
+        .loading-percent {            font-size: 2em;
+            font-weight: bold;
+            color: #22c55e;
+            margin-bottom: 10px;
+        }
+        .loading-text {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .login-screen { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; width: 100%; max-width: 400px; }
         .login-input { width: 100%; padding: 15px; font-size: 1.2em; border: 2px solid #d1d1d1; border-radius: 10px; margin-bottom: 20px; text-align: center; }
         .login-btn { width: 100%; padding: 15px; font-size: 1.2em; font-weight: bold; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
         .login-btn:active { transform: scale(0.98); }
@@ -38,20 +87,27 @@
         #loading { text-align: center; color: #666; margin-top: 20px; }
         .logout-btn { margin-top: 20px; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; }
         .error-message { background: #fee; color: #c00; padding: 10px; border-radius: 8px; margin: 10px 0; display: none; }
-        .debug-console { position: fixed; bottom: 0; left: 0; right: 0; background: #000; color: #0f0; font-family: monospace; font-size: 12px; padding: 10px; max-height: 200px; overflow-y: auto; border-top: 2px solid #0f0; z-index: 9999; }
-        .debug-console .log { margin: 2px 0; white-space: pre-wrap; word-break: break-all; }
-        .debug-console .error { color: #f00; }
-        .debug-console .warn { color: #ff0; }
-        .debug-toggle { position: fixed; bottom: 10px; right: 10px; background: #000; color: #0f0; border: 1px solid #0f0; padding: 5px 10px; border-radius: 5px; cursor: pointer; z-index: 10000; font-size: 12px; }
     </style>
 </head>
 <body>
+    <!-- 🎬 ЭКРАН ЗАГРУЗКИ -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-title">💰 Сбор на бутылку Владу</div>
+        <div class="loading-percent" id="loadingPercent">0%</div>
+        <div class="loading-bar-container">
+            <div class="loading-bar" id="loadingBar"></div>
+        </div>        <div class="loading-text">Загрузка приложения...</div>
+    </div>
+
+    <!-- ЭКРАН ВХОДА -->
     <div id="loginScreen" class="login-screen">
-        <h1>💰 Сбор на бутылку Владу</h1>        <div id="errorMessage" class="error-message"></div>
+        <h1>💰 Сбор на бутылку Владу</h1>
+        <div id="errorMessage" class="error-message"></div>
         <input type="text" id="userNameInput" class="login-input" placeholder="Введите ваше имя" maxlength="20">
         <button id="loginButton" class="login-btn" onclick="login()">Начать сбор!</button>
     </div>
 
+    <!-- ОСНОВНОЙ ЭКРАН -->
     <div id="mainScreen" class="main-screen">
         <h1>💰 Сбор на бутылку Владу</h1>
         <div class="container">
@@ -89,37 +145,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-    <div id="debugConsole" class="debug-console" style="display: none;">
-        <div style="font-weight: bold; margin-bottom: 5px;">📱 КОНСОЛЬ (нажми ✕ чтобы закрыть)</div>
-        <div id="consoleLogs"></div>
-    </div>
-    <button class="debug-toggle" onclick="toggleConsole()">📋 КОНСОЛЬ</button>
-
-    <script>
-        const consoleLogs = document.getElementById('consoleLogs');        const debugConsole = document.getElementById('debugConsole');
-        
-        function log(message, type = 'log') {
-            const div = document.createElement('div');
-            div.className = 'log ' + type;
-            const time = new Date().toLocaleTimeString();
-            div.textContent = `[${time}] ${message}`;
-            consoleLogs.appendChild(div);
-            consoleLogs.scrollTop = consoleLogs.scrollHeight;
-            console.log(message);
-        }
-
-        function toggleConsole() {
-            debugConsole.style.display = debugConsole.style.display === 'none' ? 'block' : 'none';
-        }
-
-        window.onerror = function(msg, url, line) {
-            log('❌ ОШИБКА: ' + msg, 'error');
-            return false;
-        };
-
-        log('=== ПРИЛОЖЕНИЕ ЗАПУСКАЕТСЯ ===');
-
-        // 🔥 FIREBASE КОНФИГ (ИСПРАВЛЕННЫЙ URL!)
+    <script>        // 🔥 FIREBASE КОНФИГ
         const firebaseConfig = {
             apiKey: "AIzaSyAh3Gu_cbxJEZZY92K8m1VQE34mifAQGTY",
             authDomain: "vldbotlesborbot-e82f4.firebaseapp.com",
@@ -130,78 +156,79 @@
             appId: "1:53516956583:web:8bee91ac1ca3e67a4bfc82"
         };
 
-        log('Инициализация Firebase...');
-        try {
-            firebase.initializeApp(firebaseConfig);
-            const db = firebase.database();
-            log('✅ Firebase инициализирован', 'log');
-        } catch (error) {
-            log('❌ Ошибка Firebase: ' + error.message, 'error');
-        }
-
+        firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
         let currentUserName = '';
         let currentUserId = null;
         let currentAmount = 0;
         const targetAmount = 1000;
-        const negativeMax = 11111;        const maxDisplay = 11111;
+        const negativeMax = 11111;
+        const maxDisplay = 11111;
+
+        // 🎬 ЭКРАН ЗАГРУЗКИ (5 СЕКУНД)
+        window.addEventListener('load', () => {
+            let progress = 0;
+            const loadingBar = document.getElementById('loadingBar');
+            const loadingPercent = document.getElementById('loadingPercent');
+            
+            const loadingInterval = setInterval(() => {
+                progress += 2; // 100% / 50 шагов = 2% за шаг
+                if (progress > 100) progress = 100;
+                
+                loadingBar.style.width = progress + '%';
+                loadingPercent.textContent = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(loadingInterval);
+                    setTimeout(() => {
+                        document.getElementById('loadingScreen').style.display = 'none';
+                        checkLogin();
+                    }, 500);
+                }
+            }, 100); // 100ms * 50 шагов = 5000ms = 5 секунд
+        });
+
+        function checkLogin() {
+            const savedName = localStorage.getItem('bottleUserName');
+            const savedId = localStorage.getItem('bottleUserId');
+            if (savedName && savedId) {
+                currentUserName = savedName;
+                currentUserId = savedId;                showMainScreen();
+            } else {
+                showLoginScreen();
+            }
+        }
 
         function showError(message) {
             document.getElementById('errorMessage').textContent = message;
             document.getElementById('errorMessage').style.display = 'block';
-            log('❌ Ошибка: ' + message, 'error');
         }
 
         function hideError() {
             document.getElementById('errorMessage').style.display = 'none';
         }
 
-        window.addEventListener('load', () => {
-            log('=== СТРАНИЦА ЗАГРУЗИЛАСЬ ===');
-            const savedName = localStorage.getItem('bottleUserName');
-            const savedId = localStorage.getItem('bottleUserId');
-            log('Сохранённое имя: ' + savedName);
-            log('Сохранённый ID: ' + savedId);
-            if (savedName && savedId) {
-                currentUserName = savedName;
-                currentUserId = savedId;
-                log('✅ Авто-вход как: ' + currentUserName);
-                showMainScreen();
-            } else {
-                log('ℹ️ Требуется вход');
-                showLoginScreen();
-            }
-        });
-
         function login() {
-            log('=== НАЖАТА КНОПКА ВХОДА ===');
             hideError();
             const name = document.getElementById('userNameInput').value.trim();
-            log('Введённое имя: "' + name + '"');
-            if (!name) { log('❌ Имя пустое', 'error'); showError('Введите имя!'); return; }
-            log('✅ Имя введено: ' + name);
+            if (!name) { showError('Введите имя!'); return; }
             currentUserName = name;
             currentUserId = Date.now().toString();
-            log('Создан ID: ' + currentUserId);
             localStorage.setItem('bottleUserName', currentUserName);
             localStorage.setItem('bottleUserId', currentUserId);
-            log('Данные сохранены в localStorage');
-            log('📝 Запись в Firebase...');
             db.ref('contributors/' + currentUserId).set({
                 name: currentUserName,
                 totalAmount: 0,
                 lastActive: Date.now()
             }).then(() => {
-                log('✅ Пользователь создан в Firebase');
-                showMainScreen();            }).catch((error) => {
-                log('❌ Ошибка создания пользователя: ' + error.message, 'error');
+                showMainScreen();
+            }).catch((error) => {
                 showError('Ошибка: ' + error.message);
             });
         }
 
         function logout() {
-            log('=== ВЫХОД ===');
             localStorage.removeItem('bottleUserName');
             localStorage.removeItem('bottleUserId');
             currentUserName = '';
@@ -210,29 +237,19 @@
         }
 
         function showLoginScreen() {
-            log('Показываем экран входа');
             document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('mainScreen').style.display = 'none';
         }
 
         function showMainScreen() {
-            log('Показываем основной экран');
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainScreen').style.display = 'block';
-            document.getElementById('currentUserName').textContent = currentUserName;
-            log('Подключение к totalAmount...');
-            db.ref('totalAmount').on('value', (snapshot) => {
-                const data = snapshot.val();
-                currentAmount = data !== null ? data : 0;
-                log('💰 Общая сумма: ' + currentAmount + '₽');
+            document.getElementById('currentUserName').textContent = currentUserName;            db.ref('totalAmount').on('value', (snapshot) => {
+                currentAmount = snapshot.val() !== null ? snapshot.val() : 0;
                 updateDisplay();
                 document.getElementById('loading').style.display = 'none';
             });
-            log('Подключение к contributors...');
             db.ref('contributors').on('value', (snapshot) => {
-                const data = snapshot.val();
-                log('👥 Данные участников: ' + JSON.stringify(data));
-                updateContributorsList(data);
+                updateContributorsList(snapshot.val());
             });
             if (currentUserId) {
                 db.ref('contributors/' + currentUserId + '/lastActive').set(Date.now());
@@ -243,8 +260,8 @@
         }
 
         function updateContributorsList(contributors) {
-            const listDiv = document.getElementById('contributorsList');            if (!contributors || Object.keys(contributors).length === 0) {
-                log('📋 Список участников пуст');
+            const listDiv = document.getElementById('contributorsList');
+            if (!contributors || Object.keys(contributors).length === 0) {
                 listDiv.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">Пока нет участников</div>';
                 return;
             }
@@ -263,7 +280,6 @@
                 </div>`;
             });
             listDiv.innerHTML = html;
-            log('📋 Список обновлён, участников: ' + contributorsArray.length);
             const currentUserData = contributorsArray.find(c => c.id === currentUserId);
             if (currentUserData) {
                 document.getElementById('currentUserContribution').textContent = currentUserData.amount;
@@ -276,8 +292,7 @@
             return num + '₽';
         }
 
-        function updateDisplay() {
-            const progressFill = document.getElementById('progressFill');
+        function updateDisplay() {            const progressFill = document.getElementById('progressFill');
             const progressText = document.getElementById('progressText');
             const status = document.getElementById('status');
             progressText.textContent = formatNumber(currentAmount);
@@ -292,16 +307,15 @@
             } else if (currentAmount >= maxDisplay) {
                 status.textContent = '🚀 БЕСКОНЕЧНОСТЬ!';
             } else {
-                progressFill.classList.remove('negative');                status.textContent = '✅ Цель достигнута! +' + (currentAmount - targetAmount) + '₽';
+                progressFill.classList.remove('negative');
+                status.textContent = '✅ Цель достигнута! +' + (currentAmount - targetAmount) + '₽';
             }
             progressFill.style.width = percentage + '%';
         }
 
         function changeAmount(delta) {
-            log('🔢 Изменение суммы: ' + delta);
             const newTotalAmount = currentAmount + delta;
             if (newTotalAmount > 11111 || newTotalAmount < -11111) {
-                log('⛔ Достигнут лимит!', 'warn');
                 alert('Достигнут лимит!');
                 return;
             }
