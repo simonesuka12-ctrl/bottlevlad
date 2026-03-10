@@ -8,16 +8,15 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #ffffff; color: #1a1a1a; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         
-        /* 🍔 МЕНЮ КНОПКА */
+        /* 🍔 МЕНЮ КНОПКА - ПРОЗРАЧНАЯ */
         .menu-btn {
             position: fixed;
             top: 20px;
             right: 20px;
             width: 40px;
             height: 40px;
-            background: linear-gradient(135deg, #22c55e, #16a34a);
+            background: transparent;
             border: none;
-            border-radius: 10px;
             cursor: pointer;
             z-index: 1000;
             display: flex;
@@ -25,29 +24,31 @@
             align-items: center;
             justify-content: center;
             gap: 5px;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+            padding: 5px;
         }
         .menu-btn span {
-            width: 20px;
+            width: 25px;
             height: 3px;
-            background: white;
+            background: #888;
             border-radius: 2px;
             transition: 0.3s;
         }
         .menu-btn:active { transform: scale(0.95); }
+        .menu-btn span:nth-child(2) { width: 20px; }
         
-        /* 📱 БОКОВОЕ МЕНЮ */
+        /* 📱 БОКОВОЕ МЕНЮ - ПРОЗРАЧНОЕ */
         .side-menu {
             position: fixed;
             top: 0;
             right: -300px;
             width: 300px;
             height: 100vh;
-            background: white;
-            box-shadow: -5px 0 20px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: -5px 0 20px rgba(0,0,0,0.1);
             z-index: 1001;
-            transition: right 0.3s ease;
-            padding: 80px 20px 20px;        }
+            transition: right 0.3s ease;            padding: 80px 20px 20px;
+        }
         .side-menu.active { right: 0; }
         .menu-overlay {
             position: fixed;
@@ -55,7 +56,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.3);
             z-index: 1000;
             display: none;
         }
@@ -63,25 +64,41 @@
         .menu-item {
             padding: 15px;
             margin-bottom: 10px;
-            background: #f0f0f0;
+            background: rgba(240, 240, 240, 0.5);
             border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
             transition: transform 0.1s;
         }
-        .menu-item:active { transform: scale(0.98); background: #e0e0e0; }
-        .menu-item.danger { background: #fee; color: #c00; }
-        .menu-item.danger:active { background: #fdd; }
+        .menu-item:active { transform: scale(0.98); background: rgba(224, 224, 224, 0.8); }
+        .menu-item.danger { background: rgba(255, 238, 238, 0.8); color: #c00; }
+        .menu-item.danger:active { background: rgba(255, 221, 221, 0.9); }
         .menu-title {
             font-size: 1.2em;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #e0e0e0;
+            border-bottom: 2px solid rgba(224, 224, 224, 0.5);
+            color: #666;
         }
         
-        h1 { margin-bottom: 20px; text-align: center; font-size: 1.5em; color: #1a1a1a; margin-top: 20px; }
+        h1 { margin-bottom: 20px; text-align: center; font-size: 1.5em; color: #888; margin-top: 20px; }
         .loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; width: 100%; max-width: 400px; position: fixed; top: 0; left: 0; background: white; z-index: 10000; }
-        .loading-title { font-size: 1.5em; margin-bottom: 40px; text-align: center; color: #1a1a1a; }
+        .loading-title { font-size: 1.5em; margin-bottom: 20px; text-align: center; color: #888; }
+        .vlad-message {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #d4a017;
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
         .loading-bar-container { width: 80%; height: 40px; background: #e5e5e5; border-radius: 20px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid #d1d1d1; }
         .loading-bar { height: 100%; background: linear-gradient(90deg, #fbbf24, #f59e0b); width: 0%; transition: width 0.3s ease-out; box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
         .loading-percent { font-size: 2em; font-weight: bold; color: #f59e0b; margin-bottom: 10px; }
@@ -96,7 +113,8 @@
         .progress-container { width: 100%; height: 80px; background: #e5e5e5; border-radius: 40px; overflow: hidden; position: relative; margin-bottom: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 3px solid #d1d1d1; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); position: absolute; left: 0; top: 0; box-shadow: 0 0 20px rgba(34, 197, 94, 0.3); transition: width 0.5s ease-out; }
         .progress-fill.negative { background: linear-gradient(90deg, #f87171, #ef4444); box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); left: auto; right: 0; }
-        .progress-text { position: relative; z-index: 10; font-size: 2.5em; font-weight: bold; color: #1a1a1a; text-shadow: 0 2px 4px rgba(255,255,255,0.8); text-align: center; line-height: 74px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 10px; }        .buttons { display: flex; flex-direction: column; gap: 20px; justify-content: center; margin-bottom: 30px; }
+        .progress-text { position: relative; z-index: 10; font-size: 2.5em; font-weight: bold; color: #1a1a1a; text-shadow: 0 2px 4px rgba(255,255,255,0.8); text-align: center; line-height: 74px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 10px; }
+        .buttons { display: flex; flex-direction: column; gap: 20px; justify-content: center; margin-bottom: 30px; }
         .button-row { display: flex; gap: 20px; justify-content: center; }
         .btn { width: 90px; height: 90px; border: none; border-radius: 50%; font-size: 1.8em; font-weight: bold; cursor: pointer; transition: transform 0.1s; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
         .btn:active { transform: scale(0.95); }
@@ -119,7 +137,7 @@
         
         /* 🏆 ЭКРАН ТОПОВ */
         .top-screen { display: none; width: 100%; max-width: 400px; }
-        .top-title { font-size: 1.3em; font-weight: bold; margin-bottom: 20px; text-align: center; color: #1a1a1a; }
+        .top-title { font-size: 1.3em; font-weight: bold; margin-bottom: 20px; text-align: center; color: #888; }
         .top-list { background: #f9f9f9; border-radius: 10px; padding: 15px; }
         .top-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; margin-bottom: 8px; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .top-name { font-weight: 600; color: #1a1a1a; }
@@ -127,8 +145,7 @@
         .top-amount.negative { color: #ef4444; }
         .back-btn { margin-top: 20px; padding: 12px; background: linear-gradient(135deg, #6b7280, #4b5563); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; }
         .back-btn:active { transform: scale(0.98); }
-    </style>
-</head>
+    </style></head>
 <body>
     <!-- 🍔 КНОПКА МЕНЮ -->
     <button class="menu-btn" id="menuBtn" onclick="toggleMenu()" style="display: none;">
@@ -145,11 +162,16 @@
         <div class="menu-title">📋 Меню</div>
         <div class="menu-item" onclick="showTop()">🏆 Топ вложений</div>
         <div class="menu-item" onclick="changeUser()">🔄 Сменить пользователя</div>
-        <div class="menu-item danger" onclick="logout()">🚪 Выйти</div>    </div>
+        <div class="menu-item danger" onclick="logout()">🚪 Выйти</div>
+    </div>
 
     <!-- 🎬 ЭКРАН ЗАГРУЗКИ -->
     <div id="loadingScreen" class="loading-screen">
         <div class="loading-title">💰 Сбор на бутылку Владу</div>
+        <!-- 😄 СПЕЦИАЛЬНОЕ ПОСЛАНИЕ ДЛЯ ВЛАДА -->
+        <div id="vladMessage" class="vlad-message" style="display: none;">
+            опять бухаешь сладкий? ❤
+        </div>
         <div class="loading-percent" id="loadingPercent">0%</div>
         <div class="loading-bar-container">
             <div class="loading-bar" id="loadingBar"></div>
@@ -172,8 +194,7 @@
         <div class="container">
             <div class="user-info">
                 👤 <span id="currentUserName">Гость</span><span id="adminBadge" class="admin-badge" style="display: none;">ADMIN</span> | 
-                Ваш вклад: <span id="currentUserContribution">0</span>₽
-            </div>
+                Ваш вклад: <span id="currentUserContribution">0</span>₽            </div>
 
             <!-- 🔐 АДМИН ПАНЕЛЬ -->
             <div id="adminPanel" class="admin-panel" style="display: none;">
@@ -194,7 +215,8 @@
                     <button class="btn btn-minus-10" onclick="changeAmount(-10)">−10</button>
                     <button class="btn btn-plus-10" onclick="changeAmount(10)">+10</button>
                 </div>
-                <div class="button-row">                    <button class="btn btn-minus-1" onclick="changeAmount(-1)">−</button>
+                <div class="button-row">
+                    <button class="btn btn-minus-1" onclick="changeAmount(-1)">−</button>
                     <button class="btn btn-plus-1" onclick="changeAmount(1)">+</button>
                 </div>
             </div>
@@ -221,8 +243,7 @@
 
     <script>
         const firebaseConfig = {
-            apiKey: "AIzaSyAh3Gu_cbxJEZZY92K8m1VQE34mifAQGTY",
-            authDomain: "vldbotlesborbot-e82f4.firebaseapp.com",
+            apiKey: "AIzaSyAh3Gu_cbxJEZZY92K8m1VQE34mifAQGTY",            authDomain: "vldbotlesborbot-e82f4.firebaseapp.com",
             databaseURL: "https://vldbotlesborbot-e82f4-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "vldbotlesborbot-e82f4",
             storageBucket: "vldbotlesborbot-e82f4.firebasestorage.app",
@@ -243,7 +264,8 @@
         const SECRET_ADMIN_CODE = 'admin123';
 
         window.addEventListener('load', () => {
-            let progress = 0;            const loadingBar = document.getElementById('loadingBar');
+            let progress = 0;
+            const loadingBar = document.getElementById('loadingBar');
             const loadingPercent = document.getElementById('loadingPercent');
             
             const loadingInterval = setInterval(() => {
@@ -270,8 +292,7 @@
                 isAdmin = (savedName.includes(':' + SECRET_ADMIN_CODE));
                 showMain();
             } else {
-                showLogin();
-            }
+                showLogin();            }
         }
 
         function showError(message) {
@@ -283,21 +304,44 @@
             document.getElementById('errorMessage').style.display = 'none';
         }
 
-        function isNameTaken(name) {
+        // 🔍 ПРОВЕРКА: ИМЯ ЗАНЯТО? (с исключением для админа)
+        function isNameTaken(name, excludeUserId = null) {
             return new Promise((resolve) => {
                 db.ref('contributors').once('value', (snapshot) => {
                     const contributors = snapshot.val();
-                    if (!contributors) { resolve(false); return; }
-                    const names = Object.values(contributors).map(c => c.name);
-                    resolve(names.includes(name));
+                    if (!contributors) {
+                        resolve(false);
+                        return;
+                    }
+                    
+                    // Проверяем все записи
+                    for (let id in contributors) {
+                        // Если это тот же пользователь (по ID) - пропускаем
+                        if (excludeUserId && id === excludeUserId) {
+                            continue;
+                        }
+                        // Если имя совпадает - занято
+                        if (contributors[id].name === name) {
+                            resolve(true);
+                            return;
+                        }
+                    }
+                    resolve(false);
                 });
             });
         }
+
+        // 😄 ПРОВЕРКА: ЭТО ВЛАД?
+        function isVlad(name) {
+            const vladVariations = ['влад', 'vlad', 'владик', 'владушка', 'владюша', 'владочка'];
+            const lowerName = name.toLowerCase();
+            return vladVariations.some(variation => lowerName.includes(variation));
+        }
+
         async function login() {
             hideError();
             const input = document.getElementById('userNameInput').value.trim();
-            if (!input) { showError('Введите имя!'); return; }
-            
+            if (!input) { showError('Введите имя!'); return; }            
             isAdmin = input.includes(':' + SECRET_ADMIN_CODE);
             let displayName;
             if (isAdmin) {
@@ -306,9 +350,21 @@
                 displayName = input;
             }
             
-            const taken = await isNameTaken(displayName);
+            // 😄 ПОКАЗЫВАЕМ СООБЩЕНИЕ ДЛЯ ВЛАДА
+            const vladMessage = document.getElementById('vladMessage');
+            if (isVlad(displayName)) {
+                vladMessage.style.display = 'block';
+            } else {
+                vladMessage.style.display = 'none';
+            }
+            
+            // Получаем текущий ID пользователя (если он уже существует)
+            const savedId = localStorage.getItem('bottleUserId');
+            
+            // 🔥 ПРОВЕРКА НА ДУБЛИКАТ (исключая текущего пользователя)
+            const taken = await isNameTaken(displayName, savedId);
             if (taken) {
-                showError('❌ Имя "' + displayName + '" уже занято!');
+                showError('❌ Имя "' + displayName + '" уже занято! Выберите другое.');
                 return;
             }
             
@@ -334,13 +390,13 @@
             document.getElementById('menuOverlay').classList.toggle('active');
         }
 
-        // 🏆 ПОКАЗАТЬ ТОПЫ
-        function showTop() {
+        // 🏆 ПОКАЗАТЬ ТОПЫ        function showTop() {
             toggleMenu();
             document.getElementById('mainScreen').style.display = 'none';
             document.getElementById('topScreen').style.display = 'block';
             loadTopList();
         }
+
         // 📊 ГЛАВНЫЙ ЭКРАН
         function showMain() {
             document.getElementById('topScreen').style.display = 'none';
@@ -383,14 +439,14 @@
         function loadTopList() {
             db.ref('contributors').once('value', (snapshot) => {
                 const contributors = snapshot.val();
-                const listDiv = document.getElementById('topList');
-                
+                const listDiv = document.getElementById('topList');                
                 if (!contributors || Object.keys(contributors).length === 0) {
                     listDiv.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">Пока нет участников</div>';
                     return;
                 }
                 
-                const contributorsArray = Object.entries(contributors).map(([id, data]) => ({                    id, name: data.name || 'Аноним', amount: data.totalAmount || 0
+                const contributorsArray = Object.entries(contributors).map(([id, data]) => ({
+                    id, name: data.name || 'Аноним', amount: data.totalAmount || 0
                 }));
                 
                 contributorsArray.sort((a, b) => b.amount - a.amount);
@@ -433,13 +489,13 @@
                 location.reload();
             }
         }
-
         // 🔐 АДМИН ФУНКЦИИ
         function resetTotalAmount() {
             if (confirm('⚠️ Обнулить общий счёт?')) {
                 db.ref('totalAmount').set(0).then(() => alert('✅ Счёт обнулён!'));
             }
         }
+
         function clearContributors() {
             if (confirm('⚠️ Удалить всех участников?')) {
                 db.ref('contributors').remove().then(() => location.reload());
@@ -481,14 +537,14 @@
                 alert('Достигнут лимит!');
                 return;
             }
-            db.ref('totalAmount').set(newTotalAmount);
-            if (currentUserId) {
+            db.ref('totalAmount').set(newTotalAmount);            if (currentUserId) {
                 db.ref('contributors/' + currentUserId).transaction((data) => {
                     if (data) {
                         data.totalAmount = (data.totalAmount || 0) + delta;
                         data.lastActive = Date.now();
                     }
-                    return data;                });
+                    return data;
+                });
             }
             if (navigator.vibrate) navigator.vibrate(50);
         }
