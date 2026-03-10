@@ -247,14 +247,24 @@
             cursor: pointer;
             font-size: 0.9em;
         }
+
+        .error-message {
+            background: #fee;
+            color: #c00;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <!-- Экран входа -->
     <div id="loginScreen" class="login-screen">
         <h1>💰 Сбор на бутылку Владу</h1>
+        <div id="errorMessage" class="error-message"></div>
         <input type="text" id="userNameInput" class="login-input" placeholder="Введите ваше имя" maxlength="20">
-        <button class="login-btn" onclick="login()">Начать сбор!</button>
+        <button id="loginButton" class="login-btn" onclick="login()">Начать сбор!</button>
     </div>
 
     <!-- Основной экран -->
@@ -282,8 +292,7 @@
                 <!-- Кнопки по 1₽ -->
                 <div class="button-row">
                     <button class="btn btn-minus-1" onclick="changeAmount(-1)">−</button>
-                    <button class="btn btn-plus-1" onclick="changeAmount(1)">+</button>
-                </div>
+                    <button class="btn btn-plus-1" onclick="changeAmount(1)">+</button>                </div>
             </div>
 
             <div class="info">
@@ -292,6 +301,7 @@
             </div>
             
             <div id="loading">🔄 Синхронизация...</div>
+
             <!-- Список участников -->
             <div class="contributors-section">
                 <div class="section-title">📊 Участники сбора</div>
@@ -309,6 +319,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <script>
+        console.log('=== ПРИЛОЖЕНИЕ ЗАПУСКАЕТСЯ ===');
+
         // 🔥 FIREBASE КОНФИГ
         const firebaseConfig = {
             apiKey: "AIzaSyAh3Gu_cbxJEZZY92K8m1VQE34mifAQGTY",
@@ -321,7 +333,15 @@
         };
 
         // Инициализация Firebase
-        firebase.initializeApp(firebaseConfig);
+        console.log('Инициализация Firebase...');
+        try {
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.database();
+            console.log('✅ Firebase инициализирован');
+        } catch (error) {
+            console.error('❌ Ошибка Firebase:', error);
+            showError('Ошибка подключения к базе данных');
+        }
         const db = firebase.database();
 
         // Переменные
@@ -332,52 +352,86 @@
         const negativeMax = 11111;
         const maxDisplay = 11111;
 
+        // Показать ошибку
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            console.error('ERROR:', message);
+        }
+
+        // Скрыть ошибку
+        function hideError() {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.style.display = 'none';
+        }
+
         // Проверка авторизации
         window.addEventListener('load', () => {
+            console.log('=== СТРАНИЦА ЗАГРУЗИЛАСЬ ===');
             const savedName = localStorage.getItem('bottleUserName');
             const savedId = localStorage.getItem('bottleUserId');
+            
+            console.log('Сохранённое имя:', savedName);
+            console.log('Сохранённый ID:', savedId);
             
             if (savedName && savedId) {
                 currentUserName = savedName;
                 currentUserId = savedId;
+                console.log('✅ Авто-вход как:', currentUserName);
                 showMainScreen();
-            } else {                showLoginScreen();
+            } else {
+                console.log('ℹ️ Требуется вход');
+                showLoginScreen();
             }
         });
 
         // Вход
         function login() {
-            const nameInput = document.getElementById('userNameInput');
+            console.log('=== НАЖАТА КНОПКА ВХОДА ===');
+            hideError();
+                        const nameInput = document.getElementById('userNameInput');
             const name = nameInput.value.trim();
             
+            console.log('Введённое имя:', name);
+            
             if (!name) {
-                alert('Введите имя!');
+                console.log('❌ Имя пустое');
+                showError('Введите имя!');
                 return;
             }
 
+            console.log('✅ Имя введено:', name);
+            
             currentUserName = name;
             currentUserId = Date.now().toString(); // Уникальный ID
+
+            console.log('Создан ID:', currentUserId);
 
             // Сохраняем в localStorage
             localStorage.setItem('bottleUserName', currentUserName);
             localStorage.setItem('bottleUserId', currentUserId);
+            
+            console.log('Данные сохранены в localStorage');
 
             // Создаем запись в Firebase
+            console.log('Запись в Firebase...');
             db.ref('contributors/' + currentUserId).set({
                 name: currentUserName,
                 totalAmount: 0,
                 lastActive: Date.now()
             }).then(() => {
-                console.log('User created in Firebase');
+                console.log('✅ Пользователь создан в Firebase');
                 showMainScreen();
             }).catch((error) => {
-                console.error('Error creating user:', error);
-                alert('Ошибка создания пользователя. Попробуй ещё раз.');
+                console.error('❌ Ошибка создания пользователя:', error);
+                showError('Ошибка: ' + error.message);
             });
         }
 
         // Выход
         function logout() {
+            console.log('=== ВЫХОД ===');
             localStorage.removeItem('bottleUserName');
             localStorage.removeItem('bottleUserId');
             currentUserName = '';
@@ -385,30 +439,34 @@
             showLoginScreen();
         }
 
-        // Показать экран входа
-        function showLoginScreen() {
+        // Показать экран входа        function showLoginScreen() {
+            console.log('Показываем экран входа');
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('mainScreen').style.display = 'none';
         }
+
         // Показать основной экран
         function showMainScreen() {
+            console.log('Показываем основной экран');
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainScreen').style.display = 'block';
             document.getElementById('currentUserName').textContent = currentUserName;
 
             // Подключаемся к общей сумме
+            console.log('Подключение к totalAmount...');
             db.ref('totalAmount').on('value', (snapshot) => {
                 const data = snapshot.val();
                 currentAmount = data !== null ? data : 0;
+                console.log('Общая сумма:', currentAmount);
                 updateDisplay();
                 document.getElementById('loading').style.display = 'none';
-                console.log('Total amount updated:', currentAmount);
             });
 
             // Слушаем обновления списка участников
+            console.log('Подключение к contributors...');
             db.ref('contributors').on('value', (snapshot) => {
                 const data = snapshot.val();
-                console.log('Contributors data:', data);
+                console.log('Данные участников:', data);
                 updateContributorsList(data);
             });
 
@@ -428,9 +486,9 @@
             const listDiv = document.getElementById('contributorsList');
             
             if (!contributors || Object.keys(contributors).length === 0) {
+                console.log('Список участников пуст');
                 listDiv.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">Пока нет участников</div>';
-                return;
-            }
+                return;            }
 
             // Преобразуем в массив и сортируем по сумме
             const contributorsArray = Object.entries(contributors).map(([id, data]) => ({
@@ -439,7 +497,8 @@
                 amount: data.totalAmount || 0
             }));
 
-            // Сортируем: сначала кто больше добавил            contributorsArray.sort((a, b) => b.amount - a.amount);
+            // Сортируем: сначала кто больше добавил
+            contributorsArray.sort((a, b) => b.amount - a.amount);
 
             // Генерируем HTML
             let html = '';
@@ -478,8 +537,7 @@
 
         // Обновление отображения
         function updateDisplay() {
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
+            const progressFill = document.getElementById('progressFill');            const progressText = document.getElementById('progressText');
             const status = document.getElementById('status');
 
             progressText.textContent = formatNumber(currentAmount);
@@ -488,7 +546,8 @@
             
             if (currentAmount >= targetAmount) {
                 percentage = 100;
-            } else if (currentAmount <= 0) {                percentage = 0;
+            } else if (currentAmount <= 0) {
+                percentage = 0;
             } else {
                 percentage = (currentAmount / targetAmount) * 100;
             }
@@ -513,6 +572,7 @@
 
         // Изменение суммы
         function changeAmount(delta) {
+            console.log('Изменение суммы:', delta);
             const newTotalAmount = currentAmount + delta;
             
             // Ограничения
@@ -526,18 +586,14 @@
 
             // Обновляем вклад текущего пользователя
             if (currentUserId) {
-                db.ref('contributors/' + currentUserId).transaction((data) => {
-                    if (data) {
+                db.ref('contributors/' + currentUserId).transaction((data) => {                    if (data) {
                         data.totalAmount = (data.totalAmount || 0) + delta;
                         data.lastActive = Date.now();
                     }
                     return data;
-                }).then(() => {
-                    console.log('User contribution updated');
-                }).catch((error) => {
-                    console.error('Error updating contribution:', error);
                 });
             }
+
             if (navigator.vibrate) {
                 navigator.vibrate(50);
             }
