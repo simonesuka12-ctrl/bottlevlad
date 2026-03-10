@@ -307,7 +307,6 @@
     <!-- 🔥 FIREBASE SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <script>
         // 🔥 FIREBASE КОНФИГ
@@ -324,7 +323,6 @@
         // Инициализация Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const auth = firebase.auth();
 
         // Переменные
         let currentUserName = '';
@@ -341,9 +339,9 @@
             
             if (savedName && savedId) {
                 currentUserName = savedName;
-                currentUserId = savedId;                showMainScreen();
-            } else {
-                showLoginScreen();
+                currentUserId = savedId;
+                showMainScreen();
+            } else {                showLoginScreen();
             }
         });
 
@@ -369,9 +367,13 @@
                 name: currentUserName,
                 totalAmount: 0,
                 lastActive: Date.now()
+            }).then(() => {
+                console.log('User created in Firebase');
+                showMainScreen();
+            }).catch((error) => {
+                console.error('Error creating user:', error);
+                alert('Ошибка создания пользователя. Попробуй ещё раз.');
             });
-
-            showMainScreen();
         }
 
         // Выход
@@ -388,28 +390,36 @@
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('mainScreen').style.display = 'none';
         }
-
         // Показать основной экран
-        function showMainScreen() {            document.getElementById('loginScreen').style.display = 'none';
+        function showMainScreen() {
+            document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainScreen').style.display = 'block';
             document.getElementById('currentUserName').textContent = currentUserName;
 
-            // Подключаемся к данным
+            // Подключаемся к общей сумме
             db.ref('totalAmount').on('value', (snapshot) => {
                 const data = snapshot.val();
                 currentAmount = data !== null ? data : 0;
                 updateDisplay();
                 document.getElementById('loading').style.display = 'none';
+                console.log('Total amount updated:', currentAmount);
             });
 
             // Слушаем обновления списка участников
             db.ref('contributors').on('value', (snapshot) => {
-                updateContributorsList(snapshot.val());
+                const data = snapshot.val();
+                console.log('Contributors data:', data);
+                updateContributorsList(data);
             });
 
             // Обновляем время активности
             if (currentUserId) {
                 db.ref('contributors/' + currentUserId + '/lastActive').set(Date.now());
+                
+                // Обновляем каждые 10 секунд
+                window.activeInterval = setInterval(() => {
+                    db.ref('contributors/' + currentUserId + '/lastActive').set(Date.now());
+                }, 10000);
             }
         }
 
@@ -417,8 +427,8 @@
         function updateContributorsList(contributors) {
             const listDiv = document.getElementById('contributorsList');
             
-            if (!contributors) {
-                listDiv.innerHTML = 'Пока нет участников';
+            if (!contributors || Object.keys(contributors).length === 0) {
+                listDiv.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">Пока нет участников</div>';
                 return;
             }
 
@@ -429,8 +439,7 @@
                 amount: data.totalAmount || 0
             }));
 
-            // Сортируем: сначала кто больше добавил
-            contributorsArray.sort((a, b) => b.amount - a.amount);
+            // Сортируем: сначала кто больше добавил            contributorsArray.sort((a, b) => b.amount - a.amount);
 
             // Генерируем HTML
             let html = '';
@@ -439,7 +448,8 @@
                 const amountClass = contributor.amount < 0 ? 'negative' : '';
                 const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤';
                 
-                html += `                    <div class="contributor-item" style="${isCurrentUser ? 'border: 2px solid #22c55e;' : ''}">
+                html += `
+                    <div class="contributor-item" style="${isCurrentUser ? 'border: 2px solid #22c55e;' : ''}">
                         <span class="contributor-name">${medal} ${contributor.name}${isCurrentUser ? ' (вы)' : ''}</span>
                         <span class="contributor-amount ${amountClass}">${contributor.amount}₽</span>
                     </div>
@@ -478,8 +488,7 @@
             
             if (currentAmount >= targetAmount) {
                 percentage = 100;
-            } else if (currentAmount <= 0) {
-                percentage = 0;
+            } else if (currentAmount <= 0) {                percentage = 0;
             } else {
                 percentage = (currentAmount / targetAmount) * 100;
             }
@@ -488,7 +497,8 @@
                 percentage = (Math.abs(currentAmount) / negativeMax) * 100;
                 percentage = Math.min(100, percentage);
                 progressFill.classList.add('negative');
-                status.textContent = '📉 Долг: ' + Math.abs(currentAmount) + '₽';            } else if (currentAmount < targetAmount) {
+                status.textContent = '📉 Долг: ' + Math.abs(currentAmount) + '₽';
+            } else if (currentAmount < targetAmount) {
                 progressFill.classList.remove('negative');
                 status.textContent = '📈 Осталось: ' + (targetAmount - currentAmount) + '₽';
             } else if (currentAmount >= maxDisplay) {
@@ -507,6 +517,7 @@
             
             // Ограничения
             if (newTotalAmount > 11111 || newTotalAmount < -11111) {
+                alert('Достигнут лимит!');
                 return;
             }
 
@@ -521,9 +532,12 @@
                         data.lastActive = Date.now();
                     }
                     return data;
+                }).then(() => {
+                    console.log('User contribution updated');
+                }).catch((error) => {
+                    console.error('Error updating contribution:', error);
                 });
             }
-
             if (navigator.vibrate) {
                 navigator.vibrate(50);
             }
