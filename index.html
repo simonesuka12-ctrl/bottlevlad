@@ -256,6 +256,50 @@
             margin: 10px 0;
             display: none;
         }
+
+        /* 📱 ЭКРАННАЯ КОНСОЛЬ */
+        .debug-console {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #000;
+            color: #0f0;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            border-top: 2px solid #0f0;
+            z-index: 9999;
+        }
+
+        .debug-console .log {
+            margin: 2px 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .debug-console .error {
+            color: #f00;
+        }
+
+        .debug-console .warn {
+            color: #ff0;
+        }
+
+        .debug-toggle {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: #000;            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 10000;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -292,12 +336,12 @@
                 <!-- Кнопки по 1₽ -->
                 <div class="button-row">
                     <button class="btn btn-minus-1" onclick="changeAmount(-1)">−</button>
-                    <button class="btn btn-plus-1" onclick="changeAmount(1)">+</button>                </div>
+                    <button class="btn btn-plus-1" onclick="changeAmount(1)">+</button>
+                </div>
             </div>
 
             <div class="info">
-                Цель: 1000₽ | Макс: 11111₽<br>
-                <span id="status">Общий сбор</span>
+                Цель: 1000₽ | Макс: 11111₽<br>                <span id="status">Общий сбор</span>
             </div>
             
             <div id="loading">🔄 Синхронизация...</div>
@@ -318,8 +362,42 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
+    <!-- 📱 ЭКРАННАЯ КОНСОЛЬ -->
+    <div id="debugConsole" class="debug-console" style="display: none;">
+        <div style="font-weight: bold; margin-bottom: 5px;">📱 КОНСОЛЬ (нажми ✕ чтобы закрыть)</div>
+        <div id="consoleLogs"></div>
+    </div>
+    <button class="debug-toggle" onclick="toggleConsole()">📋 КОНСОЛЬ</button>
+
     <script>
-        console.log('=== ПРИЛОЖЕНИЕ ЗАПУСКАЕТСЯ ===');
+        // === ЭКРАННАЯ КОНСОЛЬ ===
+        const consoleLogs = document.getElementById('consoleLogs');
+        const debugConsole = document.getElementById('debugConsole');
+        
+        function log(message, type = 'log') {
+            const div = document.createElement('div');
+            div.className = 'log ' + type;
+            const time = new Date().toLocaleTimeString();
+            div.textContent = `[${time}] ${message}`;
+            consoleLogs.appendChild(div);
+            consoleLogs.scrollTop = consoleLogs.scrollHeight;
+            console.log(message); // ещё и в обычную консоль
+        }
+
+        function toggleConsole() {
+            if (debugConsole.style.display === 'none') {
+                debugConsole.style.display = 'block';
+            } else {
+                debugConsole.style.display = 'none';
+            }
+        }
+        // Перехватываем ошибки
+        window.onerror = function(msg, url, line) {
+            log('❌ ОШИБКА: ' + msg, 'error');
+            return false;
+        };
+
+        log('=== ПРИЛОЖЕНИЕ ЗАПУСКАЕТСЯ ===');
 
         // 🔥 FIREBASE КОНФИГ
         const firebaseConfig = {
@@ -333,15 +411,15 @@
         };
 
         // Инициализация Firebase
-        console.log('Инициализация Firebase...');
+        log('Инициализация Firebase...');
         try {
             firebase.initializeApp(firebaseConfig);
             const db = firebase.database();
-            console.log('✅ Firebase инициализирован');
+            log('✅ Firebase инициализирован', 'log');
         } catch (error) {
-            console.error('❌ Ошибка Firebase:', error);
-            showError('Ошибка подключения к базе данных');
+            log('❌ Ошибка Firebase: ' + error.message, 'error');
         }
+
         const db = firebase.database();
 
         // Переменные
@@ -357,81 +435,80 @@
             const errorDiv = document.getElementById('errorMessage');
             errorDiv.textContent = message;
             errorDiv.style.display = 'block';
-            console.error('ERROR:', message);
+            log('❌ Ошибка: ' + message, 'error');
         }
 
         // Скрыть ошибку
-        function hideError() {
-            const errorDiv = document.getElementById('errorMessage');
+        function hideError() {            const errorDiv = document.getElementById('errorMessage');
             errorDiv.style.display = 'none';
         }
 
         // Проверка авторизации
         window.addEventListener('load', () => {
-            console.log('=== СТРАНИЦА ЗАГРУЗИЛАСЬ ===');
+            log('=== СТРАНИЦА ЗАГРУЗИЛАСЬ ===');
             const savedName = localStorage.getItem('bottleUserName');
             const savedId = localStorage.getItem('bottleUserId');
             
-            console.log('Сохранённое имя:', savedName);
-            console.log('Сохранённый ID:', savedId);
+            log('Сохранённое имя: ' + savedName);
+            log('Сохранённый ID: ' + savedId);
             
             if (savedName && savedId) {
                 currentUserName = savedName;
                 currentUserId = savedId;
-                console.log('✅ Авто-вход как:', currentUserName);
+                log('✅ Авто-вход как: ' + currentUserName);
                 showMainScreen();
             } else {
-                console.log('ℹ️ Требуется вход');
+                log('ℹ️ Требуется вход');
                 showLoginScreen();
             }
         });
 
         // Вход
         function login() {
-            console.log('=== НАЖАТА КНОПКА ВХОДА ===');
+            log('=== НАЖАТА КНОПКА ВХОДА ===');
             hideError();
-                        const nameInput = document.getElementById('userNameInput');
+            
+            const nameInput = document.getElementById('userNameInput');
             const name = nameInput.value.trim();
             
-            console.log('Введённое имя:', name);
+            log('Введённое имя: "' + name + '"');
             
             if (!name) {
-                console.log('❌ Имя пустое');
+                log('❌ Имя пустое', 'error');
                 showError('Введите имя!');
                 return;
             }
 
-            console.log('✅ Имя введено:', name);
+            log('✅ Имя введено: ' + name);
             
             currentUserName = name;
-            currentUserId = Date.now().toString(); // Уникальный ID
+            currentUserId = Date.now().toString();
 
-            console.log('Создан ID:', currentUserId);
+            log('Создан ID: ' + currentUserId);
 
             // Сохраняем в localStorage
             localStorage.setItem('bottleUserName', currentUserName);
-            localStorage.setItem('bottleUserId', currentUserId);
-            
-            console.log('Данные сохранены в localStorage');
+            localStorage.setItem('bottleUserId', currentUserId);            
+            log('Данные сохранены в localStorage');
 
             // Создаем запись в Firebase
-            console.log('Запись в Firebase...');
+            log('📝 Запись в Firebase...');
             db.ref('contributors/' + currentUserId).set({
                 name: currentUserName,
                 totalAmount: 0,
                 lastActive: Date.now()
             }).then(() => {
-                console.log('✅ Пользователь создан в Firebase');
+                log('✅ Пользователь создан в Firebase');
                 showMainScreen();
             }).catch((error) => {
-                console.error('❌ Ошибка создания пользователя:', error);
+                log('❌ Ошибка создания пользователя: ' + error.message, 'error');
                 showError('Ошибка: ' + error.message);
             });
         }
 
         // Выход
         function logout() {
-            console.log('=== ВЫХОД ===');
+            log('=== ВЫХОД ===');
             localStorage.removeItem('bottleUserName');
             localStorage.removeItem('bottleUserId');
             currentUserName = '';
@@ -439,34 +516,34 @@
             showLoginScreen();
         }
 
-        // Показать экран входа        function showLoginScreen() {
-            console.log('Показываем экран входа');
+        // Показать экран входа
+        function showLoginScreen() {
+            log('Показываем экран входа');
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('mainScreen').style.display = 'none';
         }
 
         // Показать основной экран
         function showMainScreen() {
-            console.log('Показываем основной экран');
+            log('Показываем основной экран');
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainScreen').style.display = 'block';
             document.getElementById('currentUserName').textContent = currentUserName;
 
             // Подключаемся к общей сумме
-            console.log('Подключение к totalAmount...');
+            log('Подключение к totalAmount...');
             db.ref('totalAmount').on('value', (snapshot) => {
                 const data = snapshot.val();
                 currentAmount = data !== null ? data : 0;
-                console.log('Общая сумма:', currentAmount);
+                log('💰 Общая сумма: ' + currentAmount + '₽');
                 updateDisplay();
-                document.getElementById('loading').style.display = 'none';
-            });
+                document.getElementById('loading').style.display = 'none';            });
 
             // Слушаем обновления списка участников
-            console.log('Подключение к contributors...');
+            log('Подключение к contributors...');
             db.ref('contributors').on('value', (snapshot) => {
                 const data = snapshot.val();
-                console.log('Данные участников:', data);
+                log('👥 Данные участников: ' + JSON.stringify(data));
                 updateContributorsList(data);
             });
 
@@ -474,7 +551,6 @@
             if (currentUserId) {
                 db.ref('contributors/' + currentUserId + '/lastActive').set(Date.now());
                 
-                // Обновляем каждые 10 секунд
                 window.activeInterval = setInterval(() => {
                     db.ref('contributors/' + currentUserId + '/lastActive').set(Date.now());
                 }, 10000);
@@ -486,21 +562,19 @@
             const listDiv = document.getElementById('contributorsList');
             
             if (!contributors || Object.keys(contributors).length === 0) {
-                console.log('Список участников пуст');
+                log('📋 Список участников пуст');
                 listDiv.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">Пока нет участников</div>';
-                return;            }
+                return;
+            }
 
-            // Преобразуем в массив и сортируем по сумме
             const contributorsArray = Object.entries(contributors).map(([id, data]) => ({
                 id,
                 name: data.name || 'Аноним',
                 amount: data.totalAmount || 0
             }));
 
-            // Сортируем: сначала кто больше добавил
             contributorsArray.sort((a, b) => b.amount - a.amount);
 
-            // Генерируем HTML
             let html = '';
             contributorsArray.forEach((contributor, index) => {
                 const isCurrentUser = contributor.id === currentUserId;
@@ -512,12 +586,11 @@
                         <span class="contributor-name">${medal} ${contributor.name}${isCurrentUser ? ' (вы)' : ''}</span>
                         <span class="contributor-amount ${amountClass}">${contributor.amount}₽</span>
                     </div>
-                `;
-            });
+                `;            });
 
             listDiv.innerHTML = html;
+            log('📋 Список обновлён, участников: ' + contributorsArray.length);
 
-            // Обновляем вклад текущего пользователя
             const currentUserData = contributorsArray.find(c => c.id === currentUserId);
             if (currentUserData) {
                 document.getElementById('currentUserContribution').textContent = currentUserData.amount;
@@ -537,7 +610,8 @@
 
         // Обновление отображения
         function updateDisplay() {
-            const progressFill = document.getElementById('progressFill');            const progressText = document.getElementById('progressText');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
             const status = document.getElementById('status');
 
             progressText.textContent = formatNumber(currentAmount);
@@ -561,8 +635,7 @@
                 progressFill.classList.remove('negative');
                 status.textContent = '📈 Осталось: ' + (targetAmount - currentAmount) + '₽';
             } else if (currentAmount >= maxDisplay) {
-                status.textContent = '🚀 БЕСКОНЕЧНОСТЬ!';
-            } else {
+                status.textContent = '🚀 БЕСКОНЕЧНОСТЬ!';            } else {
                 progressFill.classList.remove('negative');
                 status.textContent = '✅ Цель достигнута! +' + (currentAmount - targetAmount) + '₽';
             }
@@ -572,21 +645,20 @@
 
         // Изменение суммы
         function changeAmount(delta) {
-            console.log('Изменение суммы:', delta);
+            log('🔢 Изменение суммы: ' + delta);
             const newTotalAmount = currentAmount + delta;
             
-            // Ограничения
             if (newTotalAmount > 11111 || newTotalAmount < -11111) {
+                log('⛔ Достигнут лимит!', 'warn');
                 alert('Достигнут лимит!');
                 return;
             }
 
-            // Обновляем общую сумму
             db.ref('totalAmount').set(newTotalAmount);
 
-            // Обновляем вклад текущего пользователя
             if (currentUserId) {
-                db.ref('contributors/' + currentUserId).transaction((data) => {                    if (data) {
+                db.ref('contributors/' + currentUserId).transaction((data) => {
+                    if (data) {
                         data.totalAmount = (data.totalAmount || 0) + delta;
                         data.lastActive = Date.now();
                     }
