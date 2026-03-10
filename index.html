@@ -5,364 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Сбор на бутылку</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background: #ffffff;
-            color: #1a1a1a;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-
-        h1 {
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 1.5em;
-            color: #1a1a1a;
-        }
-
-        /* Экран входа */
-        .login-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .login-input {
-            width: 100%;
-            padding: 15px;
-            font-size: 1.2em;
-            border: 2px solid #d1d1d1;
-            border-radius: 10px;            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 15px;
-            font-size: 1.2em;
-            font-weight: bold;
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
-        }
-
-        .login-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* Основной экран */
-        .main-screen {
-            display: none;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .container {
-            width: 100%;
-        }
-
-        .user-info {
-            background: #f0f0f0;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 0.9em;
-        }
-
-        .progress-container {
-            width: 100%;
-            height: 60px;
-            background: #e5e5e5;
-            border-radius: 30px;
-            overflow: hidden;
-            position: relative;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);            border: 2px solid #d1d1d1;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #22c55e, #4ade80);
-            position: absolute;
-            left: 0;
-            top: 0;
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
-            transition: width 0.5s ease-out;
-        }
-
-        .progress-fill.negative {
-            background: linear-gradient(90deg, #f87171, #ef4444);
-            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
-            left: auto;
-            right: 0;
-        }
-
-        .progress-text {
-            position: relative;
-            z-index: 10;
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #1a1a1a;
-            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
-            text-align: center;
-            line-height: 56px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            padding: 0 10px;
-        }
-
-        .buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-
-        .button-row {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-        }
-
-        .btn {            width: 80px;
-            height: 80px;
-            border: none;
-            border-radius: 50%;
-            font-size: 1.5em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.1s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .btn:active {
-            transform: scale(0.95);
-        }
-
-        .btn-minus-1 {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-        }
-
-        .btn-plus-1 {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: white;
-        }
-
-        .btn-minus-10 {
-            background: linear-gradient(135deg, #f97316, #ea580c);
-            color: white;
-        }
-
-        .btn-plus-10 {
-            background: linear-gradient(135deg, #a855f7, #9333ea);
-            color: white;
-        }
-
-        /* Список участников */
-        .contributors-section {
-            margin-top: 30px;
-        }
-
-        .section-title {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-align: center;
-            color: #1a1a1a;
-        }
-
-        .contributors-list {
-            background: #f9f9f9;            border-radius: 10px;
-            padding: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .contributor-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            margin-bottom: 8px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .contributor-name {
-            font-weight: 600;
-            color: #1a1a1a;
-        }
-
-        .contributor-amount {
-            font-weight: bold;
-            color: #22c55e;
-        }
-
-        .contributor-amount.negative {
-            color: #ef4444;
-        }
-
-        .info {
-            text-align: center;
-            color: #666;
-            font-size: 0.9em;
-            margin-top: 20px;
-        }
-
-        #loading {
-            text-align: center;
-            color: #666;
-            margin-top: 20px;
-        }
-
-        .logout-btn {
-            margin-top: 20px;
-            padding: 10px;
-            background: #ef4444;
-            color: white;
-            border: none;            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
-
-        .error-message {
-            background: #fee;
-            color: #c00;
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            display: none;
-        }
-
-        /* 📱 ЭКРАННАЯ КОНСОЛЬ */
-        .debug-console {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #000;
-            color: #0f0;
-            font-family: monospace;
-            font-size: 12px;
-            padding: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-            border-top: 2px solid #0f0;
-            z-index: 9999;
-        }
-
-        .debug-console .log {
-            margin: 2px 0;
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-
-        .debug-console .error {
-            color: #f00;
-        }
-
-        .debug-console .warn {
-            color: #ff0;
-        }
-
-        .debug-toggle {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: #000;            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            z-index: 10000;
-            font-size: 12px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #ffffff; color: #1a1a1a; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        h1 { margin-bottom: 20px; text-align: center; font-size: 1.5em; color: #1a1a1a; }
+        .login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; width: 100%; max-width: 400px; }
+        .login-input { width: 100%; padding: 15px; font-size: 1.2em; border: 2px solid #d1d1d1; border-radius: 10px; margin-bottom: 20px; text-align: center; }
+        .login-btn { width: 100%; padding: 15px; font-size: 1.2em; font-weight: bold; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
+        .login-btn:active { transform: scale(0.98); }
+        .main-screen { display: none; width: 100%; max-width: 400px; }
+        .container { width: 100%; }
+        .user-info { background: #f0f0f0; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 0.9em; }
+        .progress-container { width: 100%; height: 60px; background: #e5e5e5; border-radius: 30px; overflow: hidden; position: relative; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid #d1d1d1; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); position: absolute; left: 0; top: 0; box-shadow: 0 0 20px rgba(34, 197, 94, 0.3); transition: width 0.5s ease-out; }
+        .progress-fill.negative { background: linear-gradient(90deg, #f87171, #ef4444); box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); left: auto; right: 0; }
+        .progress-text { position: relative; z-index: 10; font-size: 1.8em; font-weight: bold; color: #1a1a1a; text-shadow: 0 1px 2px rgba(255,255,255,0.8); text-align: center; line-height: 56px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 10px; }
+        .buttons { display: flex; flex-direction: column; gap: 15px; justify-content: center; margin-bottom: 30px; }
+        .button-row { display: flex; gap: 20px; justify-content: center; }
+        .btn { width: 80px; height: 80px; border: none; border-radius: 50%; font-size: 1.5em; font-weight: bold; cursor: pointer; transition: transform 0.1s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .btn:active { transform: scale(0.95); }
+        .btn-minus-1 { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+        .btn-plus-1 { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+        .btn-minus-10 { background: linear-gradient(135deg, #f97316, #ea580c); color: white; }
+        .btn-plus-10 { background: linear-gradient(135deg, #a855f7, #9333ea); color: white; }
+        .contributors-section { margin-top: 30px; }
+        .section-title { font-size: 1.2em; font-weight: bold; margin-bottom: 15px; text-align: center; color: #1a1a1a; }
+        .contributors-list { background: #f9f9f9; border-radius: 10px; padding: 15px; max-height: 300px; overflow-y: auto; }
+        .contributor-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 8px; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .contributor-name { font-weight: 600; color: #1a1a1a; }
+        .contributor-amount { font-weight: bold; color: #22c55e; }
+        .contributor-amount.negative { color: #ef4444; }
+        .info { text-align: center; color: #666; font-size: 0.9em; margin-top: 20px; }
+        #loading { text-align: center; color: #666; margin-top: 20px; }
+        .logout-btn { margin-top: 20px; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; }
+        .error-message { background: #fee; color: #c00; padding: 10px; border-radius: 8px; margin: 10px 0; display: none; }
+        .debug-console { position: fixed; bottom: 0; left: 0; right: 0; background: #000; color: #0f0; font-family: monospace; font-size: 12px; padding: 10px; max-height: 200px; overflow-y: auto; border-top: 2px solid #0f0; z-index: 9999; }
+        .debug-console .log { margin: 2px 0; white-space: pre-wrap; word-break: break-all; }
+        .debug-console .error { color: #f00; }
+        .debug-console .warn { color: #ff0; }
+        .debug-toggle { position: fixed; bottom: 10px; right: 10px; background: #000; color: #0f0; border: 1px solid #0f0; padding: 5px 10px; border-radius: 5px; cursor: pointer; z-index: 10000; font-size: 12px; }
     </style>
 </head>
 <body>
-    <!-- Экран входа -->
     <div id="loginScreen" class="login-screen">
-        <h1>💰 Сбор на бутылку Владу</h1>
-        <div id="errorMessage" class="error-message"></div>
+        <h1>💰 Сбор на бутылку Владу</h1>        <div id="errorMessage" class="error-message"></div>
         <input type="text" id="userNameInput" class="login-input" placeholder="Введите ваше имя" maxlength="20">
         <button id="loginButton" class="login-btn" onclick="login()">Начать сбор!</button>
     </div>
 
-    <!-- Основной экран -->
     <div id="mainScreen" class="main-screen">
         <h1>💰 Сбор на бутылку Владу</h1>
-        
         <div class="container">
             <div class="user-info">
                 👤 <span id="currentUserName">Гость</span> | 
                 Ваш вклад: <span id="currentUserContribution">0</span>₽
             </div>
-
             <div class="progress-container">
                 <div class="progress-fill" id="progressFill"></div>
                 <div class="progress-text" id="progressText">Загрузка...</div>
             </div>
-
             <div class="buttons">
-                <!-- Кнопки по 10₽ -->
                 <div class="button-row">
                     <button class="btn btn-minus-10" onclick="changeAmount(-10)">−10</button>
                     <button class="btn btn-plus-10" onclick="changeAmount(10)">+10</button>
                 </div>
-
-                <!-- Кнопки по 1₽ -->
                 <div class="button-row">
                     <button class="btn btn-minus-1" onclick="changeAmount(-1)">−</button>
                     <button class="btn btn-plus-1" onclick="changeAmount(1)">+</button>
                 </div>
             </div>
-
             <div class="info">
-                Цель: 1000₽ | Макс: 11111₽<br>                <span id="status">Общий сбор</span>
+                Цель: 1000₽ | Макс: 11111₽<br>
+                <span id="status">Общий сбор</span>
             </div>
-            
             <div id="loading">🔄 Синхронизация...</div>
-
-            <!-- Список участников -->
             <div class="contributors-section">
                 <div class="section-title">📊 Участники сбора</div>
-                <div id="contributorsList" class="contributors-list">
-                    Загрузка списка...
-                </div>
+                <div id="contributorsList" class="contributors-list">Загрузка списка...</div>
             </div>
-
             <button class="logout-btn" onclick="logout()">Выйти</button>
         </div>
     </div>
 
-    <!-- 🔥 FIREBASE SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-    <!-- 📱 ЭКРАННАЯ КОНСОЛЬ -->
     <div id="debugConsole" class="debug-console" style="display: none;">
         <div style="font-weight: bold; margin-bottom: 5px;">📱 КОНСОЛЬ (нажми ✕ чтобы закрыть)</div>
         <div id="consoleLogs"></div>
@@ -370,9 +96,7 @@
     <button class="debug-toggle" onclick="toggleConsole()">📋 КОНСОЛЬ</button>
 
     <script>
-        // === ЭКРАННАЯ КОНСОЛЬ ===
-        const consoleLogs = document.getElementById('consoleLogs');
-        const debugConsole = document.getElementById('debugConsole');
+        const consoleLogs = document.getElementById('consoleLogs');        const debugConsole = document.getElementById('debugConsole');
         
         function log(message, type = 'log') {
             const div = document.createElement('div');
@@ -381,17 +105,13 @@
             div.textContent = `[${time}] ${message}`;
             consoleLogs.appendChild(div);
             consoleLogs.scrollTop = consoleLogs.scrollHeight;
-            console.log(message); // ещё и в обычную консоль
+            console.log(message);
         }
 
         function toggleConsole() {
-            if (debugConsole.style.display === 'none') {
-                debugConsole.style.display = 'block';
-            } else {
-                debugConsole.style.display = 'none';
-            }
+            debugConsole.style.display = debugConsole.style.display === 'none' ? 'block' : 'none';
         }
-        // Перехватываем ошибки
+
         window.onerror = function(msg, url, line) {
             log('❌ ОШИБКА: ' + msg, 'error');
             return false;
@@ -399,18 +119,17 @@
 
         log('=== ПРИЛОЖЕНИЕ ЗАПУСКАЕТСЯ ===');
 
-        // 🔥 FIREBASE КОНФИГ
+        // 🔥 FIREBASE КОНФИГ (ИСПРАВЛЕННЫЙ URL!)
         const firebaseConfig = {
             apiKey: "AIzaSyAh3Gu_cbxJEZZY92K8m1VQE34mifAQGTY",
             authDomain: "vldbotlesborbot-e82f4.firebaseapp.com",
-            databaseURL: "https://vldbotlesborbot-e82f4-default-rtdb.firebaseio.com",
+            databaseURL: "https://vldbotlesborbot-e82f4-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "vldbotlesborbot-e82f4",
             storageBucket: "vldbotlesborbot-e82f4.firebasestorage.app",
             messagingSenderId: "53516956583",
             appId: "1:53516956583:web:8bee91ac1ca3e67a4bfc82"
         };
 
-        // Инициализация Firebase
         log('Инициализация Firebase...');
         try {
             firebase.initializeApp(firebaseConfig);
@@ -422,36 +141,28 @@
 
         const db = firebase.database();
 
-        // Переменные
         let currentUserName = '';
         let currentUserId = null;
         let currentAmount = 0;
         const targetAmount = 1000;
-        const negativeMax = 11111;
-        const maxDisplay = 11111;
+        const negativeMax = 11111;        const maxDisplay = 11111;
 
-        // Показать ошибку
         function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
             log('❌ Ошибка: ' + message, 'error');
         }
 
-        // Скрыть ошибку
-        function hideError() {            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.style.display = 'none';
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
         }
 
-        // Проверка авторизации
         window.addEventListener('load', () => {
             log('=== СТРАНИЦА ЗАГРУЗИЛАСЬ ===');
             const savedName = localStorage.getItem('bottleUserName');
             const savedId = localStorage.getItem('bottleUserId');
-            
             log('Сохранённое имя: ' + savedName);
             log('Сохранённый ID: ' + savedId);
-            
             if (savedName && savedId) {
                 currentUserName = savedName;
                 currentUserId = savedId;
@@ -463,35 +174,19 @@
             }
         });
 
-        // Вход
         function login() {
             log('=== НАЖАТА КНОПКА ВХОДА ===');
             hideError();
-            
-            const nameInput = document.getElementById('userNameInput');
-            const name = nameInput.value.trim();
-            
+            const name = document.getElementById('userNameInput').value.trim();
             log('Введённое имя: "' + name + '"');
-            
-            if (!name) {
-                log('❌ Имя пустое', 'error');
-                showError('Введите имя!');
-                return;
-            }
-
+            if (!name) { log('❌ Имя пустое', 'error'); showError('Введите имя!'); return; }
             log('✅ Имя введено: ' + name);
-            
             currentUserName = name;
             currentUserId = Date.now().toString();
-
             log('Создан ID: ' + currentUserId);
-
-            // Сохраняем в localStorage
             localStorage.setItem('bottleUserName', currentUserName);
-            localStorage.setItem('bottleUserId', currentUserId);            
+            localStorage.setItem('bottleUserId', currentUserId);
             log('Данные сохранены в localStorage');
-
-            // Создаем запись в Firebase
             log('📝 Запись в Firebase...');
             db.ref('contributors/' + currentUserId).set({
                 name: currentUserName,
@@ -499,14 +194,12 @@
                 lastActive: Date.now()
             }).then(() => {
                 log('✅ Пользователь создан в Firebase');
-                showMainScreen();
-            }).catch((error) => {
+                showMainScreen();            }).catch((error) => {
                 log('❌ Ошибка создания пользователя: ' + error.message, 'error');
                 showError('Ошибка: ' + error.message);
             });
         }
 
-        // Выход
         function logout() {
             log('=== ВЫХОД ===');
             localStorage.removeItem('bottleUserName');
@@ -516,146 +209,103 @@
             showLoginScreen();
         }
 
-        // Показать экран входа
         function showLoginScreen() {
             log('Показываем экран входа');
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('mainScreen').style.display = 'none';
         }
 
-        // Показать основной экран
         function showMainScreen() {
             log('Показываем основной экран');
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainScreen').style.display = 'block';
             document.getElementById('currentUserName').textContent = currentUserName;
-
-            // Подключаемся к общей сумме
             log('Подключение к totalAmount...');
             db.ref('totalAmount').on('value', (snapshot) => {
                 const data = snapshot.val();
                 currentAmount = data !== null ? data : 0;
                 log('💰 Общая сумма: ' + currentAmount + '₽');
                 updateDisplay();
-                document.getElementById('loading').style.display = 'none';            });
-
-            // Слушаем обновления списка участников
+                document.getElementById('loading').style.display = 'none';
+            });
             log('Подключение к contributors...');
             db.ref('contributors').on('value', (snapshot) => {
                 const data = snapshot.val();
                 log('👥 Данные участников: ' + JSON.stringify(data));
                 updateContributorsList(data);
             });
-
-            // Обновляем время активности
             if (currentUserId) {
                 db.ref('contributors/' + currentUserId + '/lastActive').set(Date.now());
-                
                 window.activeInterval = setInterval(() => {
                     db.ref('contributors/' + currentUserId + '/lastActive').set(Date.now());
                 }, 10000);
             }
         }
 
-        // Обновление списка участников
         function updateContributorsList(contributors) {
-            const listDiv = document.getElementById('contributorsList');
-            
-            if (!contributors || Object.keys(contributors).length === 0) {
+            const listDiv = document.getElementById('contributorsList');            if (!contributors || Object.keys(contributors).length === 0) {
                 log('📋 Список участников пуст');
                 listDiv.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">Пока нет участников</div>';
                 return;
             }
-
             const contributorsArray = Object.entries(contributors).map(([id, data]) => ({
-                id,
-                name: data.name || 'Аноним',
-                amount: data.totalAmount || 0
+                id, name: data.name || 'Аноним', amount: data.totalAmount || 0
             }));
-
             contributorsArray.sort((a, b) => b.amount - a.amount);
-
             let html = '';
             contributorsArray.forEach((contributor, index) => {
                 const isCurrentUser = contributor.id === currentUserId;
                 const amountClass = contributor.amount < 0 ? 'negative' : '';
                 const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤';
-                
-                html += `
-                    <div class="contributor-item" style="${isCurrentUser ? 'border: 2px solid #22c55e;' : ''}">
-                        <span class="contributor-name">${medal} ${contributor.name}${isCurrentUser ? ' (вы)' : ''}</span>
-                        <span class="contributor-amount ${amountClass}">${contributor.amount}₽</span>
-                    </div>
-                `;            });
-
+                html += `<div class="contributor-item" style="${isCurrentUser ? 'border: 2px solid #22c55e;' : ''}">
+                    <span class="contributor-name">${medal} ${contributor.name}${isCurrentUser ? ' (вы)' : ''}</span>
+                    <span class="contributor-amount ${amountClass}">${contributor.amount}₽</span>
+                </div>`;
+            });
             listDiv.innerHTML = html;
             log('📋 Список обновлён, участников: ' + contributorsArray.length);
-
             const currentUserData = contributorsArray.find(c => c.id === currentUserId);
             if (currentUserData) {
                 document.getElementById('currentUserContribution').textContent = currentUserData.amount;
             }
         }
 
-        // Форматирование числа
         function formatNumber(num) {
-            if (num >= maxDisplay) {
-                return '∞';
-            } else if (num <= -negativeMax) {
-                return '-∞';
-            } else {
-                return num + '₽';
-            }
+            if (num >= maxDisplay) return '∞';
+            if (num <= -negativeMax) return '-∞';
+            return num + '₽';
         }
 
-        // Обновление отображения
         function updateDisplay() {
             const progressFill = document.getElementById('progressFill');
             const progressText = document.getElementById('progressText');
             const status = document.getElementById('status');
-
             progressText.textContent = formatNumber(currentAmount);
-
-            let percentage;
-            
-            if (currentAmount >= targetAmount) {
-                percentage = 100;
-            } else if (currentAmount <= 0) {
-                percentage = 0;
-            } else {
-                percentage = (currentAmount / targetAmount) * 100;
-            }
-
+            let percentage = currentAmount >= targetAmount ? 100 : currentAmount <= 0 ? 0 : (currentAmount / targetAmount) * 100;
             if (currentAmount < 0) {
-                percentage = (Math.abs(currentAmount) / negativeMax) * 100;
-                percentage = Math.min(100, percentage);
+                percentage = Math.min(100, (Math.abs(currentAmount) / negativeMax) * 100);
                 progressFill.classList.add('negative');
                 status.textContent = '📉 Долг: ' + Math.abs(currentAmount) + '₽';
             } else if (currentAmount < targetAmount) {
                 progressFill.classList.remove('negative');
                 status.textContent = '📈 Осталось: ' + (targetAmount - currentAmount) + '₽';
             } else if (currentAmount >= maxDisplay) {
-                status.textContent = '🚀 БЕСКОНЕЧНОСТЬ!';            } else {
-                progressFill.classList.remove('negative');
-                status.textContent = '✅ Цель достигнута! +' + (currentAmount - targetAmount) + '₽';
+                status.textContent = '🚀 БЕСКОНЕЧНОСТЬ!';
+            } else {
+                progressFill.classList.remove('negative');                status.textContent = '✅ Цель достигнута! +' + (currentAmount - targetAmount) + '₽';
             }
-
             progressFill.style.width = percentage + '%';
         }
 
-        // Изменение суммы
         function changeAmount(delta) {
             log('🔢 Изменение суммы: ' + delta);
             const newTotalAmount = currentAmount + delta;
-            
             if (newTotalAmount > 11111 || newTotalAmount < -11111) {
                 log('⛔ Достигнут лимит!', 'warn');
                 alert('Достигнут лимит!');
                 return;
             }
-
             db.ref('totalAmount').set(newTotalAmount);
-
             if (currentUserId) {
                 db.ref('contributors/' + currentUserId).transaction((data) => {
                     if (data) {
@@ -665,10 +315,7 @@
                     return data;
                 });
             }
-
-            if (navigator.vibrate) {
-                navigator.vibrate(50);
-            }
+            if (navigator.vibrate) navigator.vibrate(50);
         }
     </script>
 </body>
