@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сбор на бутылку</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.5em;
+            color: #1a1a1a;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 60px;
+            background: #e5e5e5;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid #d1d1d1;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #4ade80);
+            position: absolute;
+            left: 0;
+            top: 0;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+            transition: width 0.5s ease-out;
+        }
+
+        .progress-fill.negative {
+            background: linear-gradient(90deg, #f87171, #ef4444);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+            left: auto;
+            right: 0;
+        }
+
+        .progress-text {
+            position: relative;
+            z-index: 10;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #1a1a1a;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+            text-align: center;
+            line-height: 56px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 10px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            width: 80px;
+            height: 80px;
+            border: none;
+            border-radius: 50%;
+            font-size: 2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-minus {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .btn-plus {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+
+        .info {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>💰 Сбор на бутылку Владу</h1>
+    
+    <div class="container">
+        <div class="progress-container">
+            <div class="progress-fill" id="progressFill"></div>
+            <div class="progress-text" id="progressText">0₽</div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-minus" onclick="changeAmount(-1)">−</button>
+            <button class="btn btn-plus" onclick="changeAmount(1)">+</button>
+        </div>
+
+        <div class="info">
+            Цель: 1000₽ | Макс: 11111₽<br>
+            <span id="status">Нажми + или -</span>
+        </div>
+    </div>
+
+    <script>
+        let currentAmount = 0;
+        const targetAmount = 1000;      // 🔥 Цель сбора
+        const negativeMax = 11111;      // 🔥 Максимум в минус
+        const step = 1;
+        const maxDisplay = 11111;       // 🔥 Максимум в плюс
+        function formatNumber(num) {
+            if (num >= maxDisplay) {
+                return '∞';
+            } else if (num <= -negativeMax) {
+                return '-∞';
+            } else {
+                return num + '₽';
+            }
+        }
+
+        function updateDisplay() {
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const status = document.getElementById('status');
+
+            progressText.textContent = formatNumber(currentAmount);
+
+            let percentage;
+            
+            if (currentAmount >= targetAmount) {
+                percentage = 100;
+            } else if (currentAmount <= 0) {
+                percentage = 0;
+            } else {
+                percentage = (currentAmount / targetAmount) * 100;
+            }
+
+            // КРАСНАЯ ПОЛОСКА СПРАВА
+            if (currentAmount < 0) {
+                percentage = (Math.abs(currentAmount) / negativeMax) * 100;
+                percentage = Math.min(100, percentage);
+                progressFill.classList.add('negative');
+                status.textContent = '📉 Долг: ' + Math.abs(currentAmount) + '₽';
+            } else if (currentAmount < targetAmount) {
+                progressFill.classList.remove('negative');
+                status.textContent = '📈 Осталось: ' + (targetAmount - currentAmount) + '₽';
+            } else if (currentAmount >= maxDisplay) {
+                status.textContent = '🚀 БЕСКОНЕЧНОСТЬ!';
+            } else {
+                progressFill.classList.remove('negative');
+                status.textContent = '✅ Цель достигнута! +' + (currentAmount - targetAmount) + '₽';
+            }
+
+            progressFill.style.width = percentage + '%';
+
+            localStorage.setItem('bottleAmount', currentAmount);
+        }
+
+        function changeAmount(delta) {
+            currentAmount += delta * step;            updateDisplay();
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        window.onload = function() {
+            const saved = localStorage.getItem('bottleAmount');
+            if (saved !== null) {
+                currentAmount = parseInt(saved);
+            }
+            updateDisplay();
+        };
+
+        // Свайпы
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    changeAmount(10);
+                } else {
+                    changeAmount(-10);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
