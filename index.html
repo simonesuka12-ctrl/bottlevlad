@@ -9,7 +9,7 @@
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #ffffff; color: #1a1a1a; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         h1 { margin-bottom: 20px; text-align: center; font-size: 1.5em; color: #1a1a1a; }
         
-        /* 🎬 ЭКРАН ЗАГРУЗКИ */
+        /* 🎬 ЭКРАН ЗАГРУЗКИ (ЦВЕТ ЯБЛОЧНОГО СОКА) */
         .loading-screen {
             display: flex;
             flex-direction: column;
@@ -42,14 +42,14 @@
         }
         .loading-bar {
             height: 100%;
-            background: linear-gradient(90deg, #22c55e, #4ade80);
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
             width: 0%;
             transition: width 0.3s ease-out;
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
         }
         .loading-percent {            font-size: 2em;
             font-weight: bold;
-            color: #22c55e;
+            color: #f59e0b;
             margin-bottom: 10px;
         }
         .loading-text {
@@ -85,7 +85,6 @@
         .contributor-amount.negative { color: #ef4444; }
         .info { text-align: center; color: #666; font-size: 0.9em; margin-top: 20px; }
         #loading { text-align: center; color: #666; margin-top: 20px; }
-        .logout-btn { margin-top: 20px; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; }
         .error-message { background: #fee; color: #c00; padding: 10px; border-radius: 8px; margin: 10px 0; display: none; }
     </style>
 </head>
@@ -96,8 +95,8 @@
         <div class="loading-percent" id="loadingPercent">0%</div>
         <div class="loading-bar-container">
             <div class="loading-bar" id="loadingBar"></div>
-        </div>        <div class="loading-text">Загрузка приложения...</div>
-    </div>
+        </div>
+        <div class="loading-text">Загрузка приложения...</div>    </div>
 
     <!-- ЭКРАН ВХОДА -->
     <div id="loginScreen" class="login-screen">
@@ -138,16 +137,15 @@
                 <div class="section-title">📊 Участники сбора</div>
                 <div id="contributorsList" class="contributors-list">Загрузка списка...</div>
             </div>
-            <button class="logout-btn" onclick="logout()">Выйти</button>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-    <script>        // 🔥 FIREBASE КОНФИГ
-        const firebaseConfig = {
-            apiKey: "AIzaSyAh3Gu_cbxJEZZY92K8m1VQE34mifAQGTY",
+    <script>
+        // 🔥 FIREBASE КОНФИГ
+        const firebaseConfig = {            apiKey: "AIzaSyAh3Gu_cbxJEZZY92K8m1VQE34mifAQGTY",
             authDomain: "vldbotlesborbot-e82f4.firebaseapp.com",
             databaseURL: "https://vldbotlesborbot-e82f4-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "vldbotlesborbot-e82f4",
@@ -173,7 +171,7 @@
             const loadingPercent = document.getElementById('loadingPercent');
             
             const loadingInterval = setInterval(() => {
-                progress += 2; // 100% / 50 шагов = 2% за шаг
+                progress += 2;
                 if (progress > 100) progress = 100;
                 
                 loadingBar.style.width = progress + '%';
@@ -186,7 +184,7 @@
                         checkLogin();
                     }, 500);
                 }
-            }, 100); // 100ms * 50 шагов = 5000ms = 5 секунд
+            }, 100);
         });
 
         function checkLogin() {
@@ -194,9 +192,9 @@
             const savedId = localStorage.getItem('bottleUserId');
             if (savedName && savedId) {
                 currentUserName = savedName;
-                currentUserId = savedId;                showMainScreen();
-            } else {
-                showLoginScreen();
+                currentUserId = savedId;
+                showMainScreen();
+            } else {                showLoginScreen();
             }
         }
 
@@ -228,14 +226,6 @@
             });
         }
 
-        function logout() {
-            localStorage.removeItem('bottleUserName');
-            localStorage.removeItem('bottleUserId');
-            currentUserName = '';
-            currentUserId = null;
-            showLoginScreen();
-        }
-
         function showLoginScreen() {
             document.getElementById('loginScreen').style.display = 'flex';
         }
@@ -243,7 +233,8 @@
         function showMainScreen() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainScreen').style.display = 'block';
-            document.getElementById('currentUserName').textContent = currentUserName;            db.ref('totalAmount').on('value', (snapshot) => {
+            document.getElementById('currentUserName').textContent = currentUserName;
+            db.ref('totalAmount').on('value', (snapshot) => {
                 currentAmount = snapshot.val() !== null ? snapshot.val() : 0;
                 updateDisplay();
                 document.getElementById('loading').style.display = 'none';
@@ -252,8 +243,7 @@
                 updateContributorsList(snapshot.val());
             });
             if (currentUserId) {
-                db.ref('contributors/' + currentUserId + '/lastActive').set(Date.now());
-                window.activeInterval = setInterval(() => {
+                db.ref('contributors/' + currentUserId + '/lastActive').set(Date.now());                window.activeInterval = setInterval(() => {
                     db.ref('contributors/' + currentUserId + '/lastActive').set(Date.now());
                 }, 10000);
             }
@@ -292,7 +282,8 @@
             return num + '₽';
         }
 
-        function updateDisplay() {            const progressFill = document.getElementById('progressFill');
+        function updateDisplay() {
+            const progressFill = document.getElementById('progressFill');
             const progressText = document.getElementById('progressText');
             const status = document.getElementById('status');
             progressText.textContent = formatNumber(currentAmount);
@@ -301,8 +292,7 @@
                 percentage = Math.min(100, (Math.abs(currentAmount) / negativeMax) * 100);
                 progressFill.classList.add('negative');
                 status.textContent = '📉 Долг: ' + Math.abs(currentAmount) + '₽';
-            } else if (currentAmount < targetAmount) {
-                progressFill.classList.remove('negative');
+            } else if (currentAmount < targetAmount) {                progressFill.classList.remove('negative');
                 status.textContent = '📈 Осталось: ' + (targetAmount - currentAmount) + '₽';
             } else if (currentAmount >= maxDisplay) {
                 status.textContent = '🚀 БЕСКОНЕЧНОСТЬ!';
