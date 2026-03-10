@@ -20,21 +20,72 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
             padding: 20px;
         }
 
         h1 {
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             text-align: center;
             font-size: 1.5em;
             color: #1a1a1a;
         }
 
-        .container {
+        /* Экран входа */
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
             width: 100%;
             max-width: 400px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            border: 2px solid #d1d1d1;
+            border-radius: 10px;            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Основной экран */
+        .main-screen {
+            display: none;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .container {
+            width: 100%;
+        }
+
+        .user-info {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 0.9em;
         }
 
         .progress-container {
@@ -45,9 +96,9 @@
             overflow: hidden;
             position: relative;
             margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border: 2px solid #d1d1d1;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);            border: 2px solid #d1d1d1;
         }
+
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #22c55e, #4ade80);
@@ -85,7 +136,7 @@
             flex-direction: column;
             gap: 15px;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
 
         .button-row {
@@ -94,9 +145,9 @@
             justify-content: center;
         }
 
-        .btn {
-            width: 80px;
-            height: 80px;            border: none;
+        .btn {            width: 80px;
+            height: 80px;
+            border: none;
             border-radius: 50%;
             font-size: 1.5em;
             font-weight: bold;
@@ -129,6 +180,51 @@
             color: white;
         }
 
+        /* Список участников */
+        .contributors-section {
+            margin-top: 30px;
+        }
+
+        .section-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #1a1a1a;
+        }
+
+        .contributors-list {
+            background: #f9f9f9;            border-radius: 10px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .contributor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .contributor-name {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .contributor-amount {
+            font-weight: bold;
+            color: #22c55e;
+        }
+
+        .contributor-amount.negative {
+            color: #ef4444;
+        }
+
         .info {
             text-align: center;
             color: #666;
@@ -141,70 +237,223 @@
             color: #666;
             margin-top: 20px;
         }
+
+        .logout-btn {
+            margin-top: 20px;
+            padding: 10px;
+            background: #ef4444;
+            color: white;
+            border: none;            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
-    <h1>💰 Сбор на бутылку Владу</h1>
-        <div class="container">
-        <div class="progress-container">
-            <div class="progress-fill" id="progressFill"></div>
-            <div class="progress-text" id="progressText">Загрузка...</div>
-        </div>
+    <!-- Экран входа -->
+    <div id="loginScreen" class="login-screen">
+        <h1>💰 Сбор на бутылку Владу</h1>
+        <input type="text" id="userNameInput" class="login-input" placeholder="Введите ваше имя" maxlength="20">
+        <button class="login-btn" onclick="login()">Начать сбор!</button>
+    </div>
 
-        <div class="buttons">
-            <!-- Кнопки по 10₽ -->
-            <div class="button-row">
-                <button class="btn btn-minus-10" onclick="changeAmount(-10)">−10</button>
-                <button class="btn btn-plus-10" onclick="changeAmount(10)">+10</button>
-            </div>
-
-            <!-- Кнопки по 1₽ -->
-            <div class="button-row">
-                <button class="btn btn-minus-1" onclick="changeAmount(-1)">−</button>
-                <button class="btn btn-plus-1" onclick="changeAmount(1)">+</button>
-            </div>
-        </div>
-
-        <div class="info">
-            Цель: 1000₽ | Макс: 11111₽<br>
-            <span id="status">Общий сбор</span>
-        </div>
+    <!-- Основной экран -->
+    <div id="mainScreen" class="main-screen">
+        <h1>💰 Сбор на бутылку Владу</h1>
         
-        <div id="loading">🔄 Синхронизация...</div>
+        <div class="container">
+            <div class="user-info">
+                👤 <span id="currentUserName">Гость</span> | 
+                Ваш вклад: <span id="currentUserContribution">0</span>₽
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-fill" id="progressFill"></div>
+                <div class="progress-text" id="progressText">Загрузка...</div>
+            </div>
+
+            <div class="buttons">
+                <!-- Кнопки по 10₽ -->
+                <div class="button-row">
+                    <button class="btn btn-minus-10" onclick="changeAmount(-10)">−10</button>
+                    <button class="btn btn-plus-10" onclick="changeAmount(10)">+10</button>
+                </div>
+
+                <!-- Кнопки по 1₽ -->
+                <div class="button-row">
+                    <button class="btn btn-minus-1" onclick="changeAmount(-1)">−</button>
+                    <button class="btn btn-plus-1" onclick="changeAmount(1)">+</button>
+                </div>
+            </div>
+
+            <div class="info">
+                Цель: 1000₽ | Макс: 11111₽<br>
+                <span id="status">Общий сбор</span>
+            </div>
+            
+            <div id="loading">🔄 Синхронизация...</div>
+            <!-- Список участников -->
+            <div class="contributors-section">
+                <div class="section-title">📊 Участники сбора</div>
+                <div id="contributorsList" class="contributors-list">
+                    Загрузка списка...
+                </div>
+            </div>
+
+            <button class="logout-btn" onclick="logout()">Выйти</button>
+        </div>
     </div>
 
     <!-- 🔥 FIREBASE SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <script>
-        // 🔥 ВСТАВЬ СЮДА СВОЙ КОНФИГ ИЗ FIREBASE
+        // 🔥 FIREBASE КОНФИГ
         const firebaseConfig = {
-            apiKey: "СЮДА_ВСТАВИТЬ_apiKey",
-            authDomain: "СЮДА_ВСТАВИТЬ_authDomain",
-            databaseURL: "СЮДА_ВСТАВИТЬ_databaseURL",
-            projectId: "СЮДА_ВСТАВИТЬ_projectId",
-            storageBucket: "СЮДА_ВСТАВИТЬ_storageBucket",
-            messagingSenderId: "СЮДА_ВСТАВИТЬ_messagingSenderId",
-            appId: "СЮДА_ВСТАВИТЬ_appId"
+            apiKey: "AIzaSyAh3Gu_cbxJEZZY92K8m1VQE34mifAQGTY",
+            authDomain: "vldbotlesborbot-e82f4.firebaseapp.com",
+            databaseURL: "https://vldbotlesborbot-e82f4-default-rtdb.firebaseio.com",
+            projectId: "vldbotlesborbot-e82f4",
+            storageBucket: "vldbotlesborbot-e82f4.firebasestorage.app",
+            messagingSenderId: "53516956583",
+            appId: "1:53516956583:web:8bee91ac1ca3e67a4bfc82"
         };
 
         // Инициализация Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        const auth = firebase.auth();
 
         // Переменные
-        let currentAmount = 0;        const targetAmount = 1000;
+        let currentUserName = '';
+        let currentUserId = null;
+        let currentAmount = 0;
+        const targetAmount = 1000;
         const negativeMax = 11111;
         const maxDisplay = 11111;
 
-        // Чтение данных из Firebase
-        db.ref('bottleAmount').on('value', (snapshot) => {
-            const data = snapshot.val();
-            currentAmount = data !== null ? data : 0;
-            updateDisplay();
-            document.getElementById('loading').style.display = 'none';
+        // Проверка авторизации
+        window.addEventListener('load', () => {
+            const savedName = localStorage.getItem('bottleUserName');
+            const savedId = localStorage.getItem('bottleUserId');
+            
+            if (savedName && savedId) {
+                currentUserName = savedName;
+                currentUserId = savedId;                showMainScreen();
+            } else {
+                showLoginScreen();
+            }
         });
+
+        // Вход
+        function login() {
+            const nameInput = document.getElementById('userNameInput');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                alert('Введите имя!');
+                return;
+            }
+
+            currentUserName = name;
+            currentUserId = Date.now().toString(); // Уникальный ID
+
+            // Сохраняем в localStorage
+            localStorage.setItem('bottleUserName', currentUserName);
+            localStorage.setItem('bottleUserId', currentUserId);
+
+            // Создаем запись в Firebase
+            db.ref('contributors/' + currentUserId).set({
+                name: currentUserName,
+                totalAmount: 0,
+                lastActive: Date.now()
+            });
+
+            showMainScreen();
+        }
+
+        // Выход
+        function logout() {
+            localStorage.removeItem('bottleUserName');
+            localStorage.removeItem('bottleUserId');
+            currentUserName = '';
+            currentUserId = null;
+            showLoginScreen();
+        }
+
+        // Показать экран входа
+        function showLoginScreen() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('mainScreen').style.display = 'none';
+        }
+
+        // Показать основной экран
+        function showMainScreen() {            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainScreen').style.display = 'block';
+            document.getElementById('currentUserName').textContent = currentUserName;
+
+            // Подключаемся к данным
+            db.ref('totalAmount').on('value', (snapshot) => {
+                const data = snapshot.val();
+                currentAmount = data !== null ? data : 0;
+                updateDisplay();
+                document.getElementById('loading').style.display = 'none';
+            });
+
+            // Слушаем обновления списка участников
+            db.ref('contributors').on('value', (snapshot) => {
+                updateContributorsList(snapshot.val());
+            });
+
+            // Обновляем время активности
+            if (currentUserId) {
+                db.ref('contributors/' + currentUserId + '/lastActive').set(Date.now());
+            }
+        }
+
+        // Обновление списка участников
+        function updateContributorsList(contributors) {
+            const listDiv = document.getElementById('contributorsList');
+            
+            if (!contributors) {
+                listDiv.innerHTML = 'Пока нет участников';
+                return;
+            }
+
+            // Преобразуем в массив и сортируем по сумме
+            const contributorsArray = Object.entries(contributors).map(([id, data]) => ({
+                id,
+                name: data.name || 'Аноним',
+                amount: data.totalAmount || 0
+            }));
+
+            // Сортируем: сначала кто больше добавил
+            contributorsArray.sort((a, b) => b.amount - a.amount);
+
+            // Генерируем HTML
+            let html = '';
+            contributorsArray.forEach((contributor, index) => {
+                const isCurrentUser = contributor.id === currentUserId;
+                const amountClass = contributor.amount < 0 ? 'negative' : '';
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤';
+                
+                html += `                    <div class="contributor-item" style="${isCurrentUser ? 'border: 2px solid #22c55e;' : ''}">
+                        <span class="contributor-name">${medal} ${contributor.name}${isCurrentUser ? ' (вы)' : ''}</span>
+                        <span class="contributor-amount ${amountClass}">${contributor.amount}₽</span>
+                    </div>
+                `;
+            });
+
+            listDiv.innerHTML = html;
+
+            // Обновляем вклад текущего пользователя
+            const currentUserData = contributorsArray.find(c => c.id === currentUserId);
+            if (currentUserData) {
+                document.getElementById('currentUserContribution').textContent = currentUserData.amount;
+            }
+        }
 
         // Форматирование числа
         function formatNumber(num) {
@@ -239,11 +488,11 @@
                 percentage = (Math.abs(currentAmount) / negativeMax) * 100;
                 percentage = Math.min(100, percentage);
                 progressFill.classList.add('negative');
-                status.textContent = '📉 Долг: ' + Math.abs(currentAmount) + '₽';
-            } else if (currentAmount < targetAmount) {
+                status.textContent = '📉 Долг: ' + Math.abs(currentAmount) + '₽';            } else if (currentAmount < targetAmount) {
                 progressFill.classList.remove('negative');
                 status.textContent = '📈 Осталось: ' + (targetAmount - currentAmount) + '₽';
-            } else if (currentAmount >= maxDisplay) {                status.textContent = '🚀 БЕСКОНЕЧНОСТЬ!';
+            } else if (currentAmount >= maxDisplay) {
+                status.textContent = '🚀 БЕСКОНЕЧНОСТЬ!';
             } else {
                 progressFill.classList.remove('negative');
                 status.textContent = '✅ Цель достигнута! +' + (currentAmount - targetAmount) + '₽';
@@ -254,21 +503,26 @@
 
         // Изменение суммы
         function changeAmount(delta) {
-            const newAmount = currentAmount + delta;
+            const newTotalAmount = currentAmount + delta;
             
             // Ограничения
-            if (newAmount > 11111 || newAmount < -11111) {
+            if (newTotalAmount > 11111 || newTotalAmount < -11111) {
                 return;
             }
 
-            // Запись в Firebase
-            db.ref('bottleAmount').set(newAmount)
-                .then(() => {
-                    console.log('Updated:', newAmount);
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
+            // Обновляем общую сумму
+            db.ref('totalAmount').set(newTotalAmount);
+
+            // Обновляем вклад текущего пользователя
+            if (currentUserId) {
+                db.ref('contributors/' + currentUserId).transaction((data) => {
+                    if (data) {
+                        data.totalAmount = (data.totalAmount || 0) + delta;
+                        data.lastActive = Date.now();
+                    }
+                    return data;
                 });
+            }
 
             if (navigator.vibrate) {
                 navigator.vibrate(50);
