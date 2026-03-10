@@ -6,9 +6,8 @@
     <title>Сбор на бутылку</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #ffffff; color: #1a1a1a; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #ffffff; color: #1a1a1a; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 80px 20px 20px; }
         
-        /* 🍔 МЕНЮ КНОПКА - ПРОЗРАЧНАЯ */
         .menu-btn {
             position: fixed;
             top: 20px;
@@ -36,7 +35,6 @@
         .menu-btn:active { transform: scale(0.95); }
         .menu-btn span:nth-child(2) { width: 20px; }
         
-        /* 📱 БОКОВОЕ МЕНЮ - ПРОЗРАЧНОЕ */
         .side-menu {
             position: fixed;
             top: 0;
@@ -47,9 +45,9 @@
             backdrop-filter: blur(10px);
             box-shadow: -5px 0 20px rgba(0,0,0,0.1);
             z-index: 1001;
-            transition: right 0.3s ease;            padding: 80px 20px 20px;
-        }
-        .side-menu.active { right: 0; }
+            transition: right 0.3s ease;
+            padding: 100px 20px 20px;
+        }        .side-menu.active { right: 0; }
         .menu-overlay {
             position: fixed;
             top: 0;
@@ -81,36 +79,73 @@
             color: #666;
         }
         
-        h1 { margin-bottom: 20px; text-align: center; font-size: 1.5em; color: #888; margin-top: 20px; }
-        .loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; width: 100%; max-width: 400px; position: fixed; top: 0; left: 0; background: white; z-index: 10000; }
-        .loading-title { font-size: 1.5em; margin-bottom: 20px; text-align: center; color: #888; }
-        .vlad-message {
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
-            color: #d4a017;
-            padding: 15px 20px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            font-size: 1.1em;
-            font-weight: bold;
+        h1 { margin-bottom: 30px; text-align: center; font-size: 1.5em; color: #888; }
+        
+        .login-screen { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 400px; padding-top: 50px; }
+        .login-input { width: 100%; padding: 15px; font-size: 1.2em; border: 2px solid #d1d1d1; border-radius: 10px; margin-bottom: 15px; text-align: center; }
+        .password-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        .password-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            border: 2px solid #d1d1d1;
+            border-radius: 10px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-            animation: pulse 2s infinite;
+            padding-right: 50px;
+        }        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 5px;
+            opacity: 0.5;
         }
-        @keyframes pulse {            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        .loading-bar-container { width: 80%; height: 40px; background: #e5e5e5; border-radius: 20px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid #d1d1d1; }
-        .loading-bar { height: 100%; background: linear-gradient(90deg, #fbbf24, #f59e0b); width: 0%; transition: width 0.3s ease-out; box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
-        .loading-percent { font-size: 2em; font-weight: bold; color: #f59e0b; margin-bottom: 10px; }
-        .loading-text { color: #666; font-size: 0.9em; }
-        .login-screen { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; width: 100%; max-width: 400px; }
-        .login-input { width: 100%; padding: 15px; font-size: 1.2em; border: 2px solid #d1d1d1; border-radius: 10px; margin-bottom: 20px; text-align: center; }
+        .password-toggle:hover { opacity: 1; }
         .login-btn { width: 100%; padding: 15px; font-size: 1.2em; font-weight: bold; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
         .login-btn:active { transform: scale(0.98); }
-        .main-screen { display: none; width: 100%; max-width: 400px; }
+        .error-message { background: #fee; color: #c00; padding: 10px; border-radius: 8px; margin: 10px 0; display: none; }
+        .secret-hint { color: #999; font-size: 0.75em; margin-top: 10px; font-style: italic; text-align: center; }
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .remember-me input {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .loading-screen { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 400px; padding-top: 100px; }
+        .loading-title { font-size: 1.5em; margin-bottom: 20px; text-align: center; color: #888; }
+        .vlad-message { color: #000; padding: 15px 20px; margin-bottom: 30px; font-size: 1.1em; font-weight: bold; text-align: center; }
+        .loading-bar-container { width: 80%; height: 40px; background: #e5e5e5; border-radius: 20px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid #d1d1d1; }
+        .loading-bar { height: 100%; background: linear-gradient(90deg, #fbbf24, #f59e0b); width: 0%; transition: width 0.3s ease-out; box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
+        .loading-percent { font-size: 2em; font-weight: bold; color: #f59e0b; margin-bottom: 10px; transition: color 0.3s; }
+        .loading-text { color: #666; font-size: 0.9em; }
+        
+        .main-screen { display: none; width: 100%; max-width: 400px; padding-top: 20px; }
         .container { width: 100%; }
         .user-info { background: #f0f0f0; padding: 10px; border-radius: 8px; margin-bottom: 30px; text-align: center; font-size: 0.9em; }
-        .progress-container { width: 100%; height: 80px; background: #e5e5e5; border-radius: 40px; overflow: hidden; position: relative; margin-bottom: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 3px solid #d1d1d1; }
+        .contribution-amount {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #22c55e;
+            transition: color 0.2s ease;
+        }
+        .contribution-amount.changed {
+            color: #f59e0b;
+        }        .progress-container { width: 100%; height: 80px; background: #e5e5e5; border-radius: 40px; overflow: hidden; position: relative; margin-bottom: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 3px solid #d1d1d1; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); position: absolute; left: 0; top: 0; box-shadow: 0 0 20px rgba(34, 197, 94, 0.3); transition: width 0.5s ease-out; }
         .progress-fill.negative { background: linear-gradient(90deg, #f87171, #ef4444); box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); left: auto; right: 0; }
         .progress-text { position: relative; z-index: 10; font-size: 2.5em; font-weight: bold; color: #1a1a1a; text-shadow: 0 2px 4px rgba(255,255,255,0.8); text-align: center; line-height: 74px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 10px; }
@@ -120,58 +155,69 @@
         .btn:active { transform: scale(0.95); }
         .btn-minus-1 { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
         .btn-plus-1 { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
-        .btn-minus-10 { background: linear-gradient(135deg, #f97316, #ea580c); color: white; }
-        .btn-plus-10 { background: linear-gradient(135deg, #a855f7, #9333ea); color: white; }
         .info { text-align: center; color: #666; font-size: 1em; margin-top: 20px; }
         #loading { text-align: center; color: #666; margin-top: 20px; }
-        .error-message { background: #fee; color: #c00; padding: 10px; border-radius: 8px; margin: 10px 0; display: none; }
-        .admin-panel { background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3); }
-        .admin-title { font-size: 1.2em; font-weight: bold; margin-bottom: 15px; text-align: center; }
-        .admin-buttons { display: flex; flex-direction: column; gap: 10px; }
-        .admin-btn { padding: 12px; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; transition: transform 0.1s; }
-        .admin-btn:active { transform: scale(0.98); }
-        .admin-btn-reset { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
-        .admin-btn-clear { background: linear-gradient(135deg, #f97316, #ea580c); color: white; }
-        .admin-badge { background: #ef4444; color: white; padding: 3px 8px; border-radius: 5px; font-size: 0.7em; margin-left: 5px; }
-        .secret-hint { color: #999; font-size: 0.75em; margin-top: 10px; font-style: italic; }
         
-        /* 🏆 ЭКРАН ТОПОВ */
-        .top-screen { display: none; width: 100%; max-width: 400px; }
+        .admin-section { display: none; margin-top: 20px; padding-top: 20px; border-top: 2px solid rgba(224, 224, 224, 0.5); }
+        .admin-section-title { font-size: 0.9em; color: #999; margin-bottom: 10px; text-align: center; }
+        
+        .top-screen { display: none; width: 100%; max-width: 400px; padding-top: 50px; }
         .top-title { font-size: 1.3em; font-weight: bold; margin-bottom: 20px; text-align: center; color: #888; }
         .top-list { background: #f9f9f9; border-radius: 10px; padding: 15px; }
         .top-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; margin-bottom: 8px; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .top-info { display: flex; align-items: center; gap: 10px; flex: 1; }
         .top-name { font-weight: 600; color: #1a1a1a; }
-        .top-amount { font-weight: bold; color: #22c55e; }
+        .top-amount { font-weight: bold; color: #22c55e; margin-right: 10px; }
         .top-amount.negative { color: #ef4444; }
+        .delete-btn { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 5px; padding: 5px 10px; font-size: 0.9em; cursor: pointer; transition: transform 0.1s; }
+        .delete-btn:active { transform: scale(0.95); }
         .back-btn { margin-top: 20px; padding: 12px; background: linear-gradient(135deg, #6b7280, #4b5563); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; }
         .back-btn:active { transform: scale(0.98); }
-    </style></head>
+    </style>
+</head>
 <body>
-    <!-- 🍔 КНОПКА МЕНЮ -->
     <button class="menu-btn" id="menuBtn" onclick="toggleMenu()" style="display: none;">
         <span></span>
         <span></span>
         <span></span>
     </button>
     
-    <!-- 📱 ЗАТЕМНЕНИЕ -->
     <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
     
-    <!-- 📱 БОКОВОЕ МЕНЮ -->
     <div class="side-menu" id="sideMenu">
         <div class="menu-title">📋 Меню</div>
         <div class="menu-item" onclick="showTop()">🏆 Топ вложений</div>
         <div class="menu-item" onclick="changeUser()">🔄 Сменить пользователя</div>
         <div class="menu-item danger" onclick="logout()">🚪 Выйти</div>
+        
+        <div id="adminSection" class="admin-section">
+            <div class="admin-section-title">⚙️ Администрирование</div>
+            <div class="menu-item" onclick="resetTotalAmount()">🗑️ Обнулить счёт</div>
+            <div class="menu-item danger" onclick="clearContributors()">🧹 Удалить всех участников</div>
+        </div>    </div>
+
+    <div id="loginScreen" class="login-screen">
+        <h1>💰 Сбор на бутылку Владу</h1>
+        <div id="errorMessage" class="error-message"></div>
+        <input type="text" id="userNameInput" class="login-input" placeholder="Введите ваше имя" maxlength="30">
+        
+        <div class="password-container">
+            <input type="password" id="userPasswordInput" class="password-input" placeholder="Придумайте пароль (мин. 5 символов)" maxlength="20">
+            <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
+        </div>
+        
+        <div class="remember-me">
+            <input type="checkbox" id="rememberPassword">
+            <label for="rememberPassword">Запомнить пароль</label>
+        </div>
+        
+        <button id="loginButton" class="login-btn" onclick="login()">Начать сбор!</button>
+        <div class="secret-hint">💡 Максимум 3 профиля с одного устройства</div>
     </div>
 
-    <!-- 🎬 ЭКРАН ЗАГРУЗКИ -->
     <div id="loadingScreen" class="loading-screen">
         <div class="loading-title">💰 Сбор на бутылку Владу</div>
-        <!-- 😄 СПЕЦИАЛЬНОЕ ПОСЛАНИЕ ДЛЯ ВЛАДА -->
-        <div id="vladMessage" class="vlad-message" style="display: none;">
-            опять бухаешь сладкий? ❤
-        </div>
+        <div id="vladMessage" class="vlad-message"></div>
         <div class="loading-percent" id="loadingPercent">0%</div>
         <div class="loading-bar-container">
             <div class="loading-bar" id="loadingBar"></div>
@@ -179,30 +225,11 @@
         <div class="loading-text">Загрузка приложения...</div>
     </div>
 
-    <!-- 🔐 ЭКРАН ВХОДА -->
-    <div id="loginScreen" class="login-screen">
-        <h1>💰 Сбор на бутылку Владу</h1>
-        <div id="errorMessage" class="error-message"></div>
-        <input type="text" id="userNameInput" class="login-input" placeholder="Введите ваше имя" maxlength="30">
-        <button id="loginButton" class="login-btn" onclick="login()">Начать сбор!</button>
-        <div class="secret-hint">💡 Подсказка: для особых возможностей используйте формат "Имя:код"</div>
-    </div>
-
-    <!-- 📊 ГЛАВНЫЙ ЭКРАН -->
     <div id="mainScreen" class="main-screen">
         <h1>💰 Сбор на бутылку Владу</h1>
         <div class="container">
             <div class="user-info">
-                👤 <span id="currentUserName">Гость</span><span id="adminBadge" class="admin-badge" style="display: none;">ADMIN</span> | 
-                Ваш вклад: <span id="currentUserContribution">0</span>₽            </div>
-
-            <!-- 🔐 АДМИН ПАНЕЛЬ -->
-            <div id="adminPanel" class="admin-panel" style="display: none;">
-                <div class="admin-title">🔐 Панель управления</div>
-                <div class="admin-buttons">
-                    <button class="admin-btn admin-btn-reset" onclick="resetTotalAmount()">🗑️ Обнулить счёт</button>
-                    <button class="admin-btn admin-btn-clear" onclick="clearContributors()">🧹 Удалить всех участников</button>
-                </div>
+                👤 Ваш вклад: <span id="currentUserContribution" class="contribution-amount">0</span>₽
             </div>
 
             <div class="progress-container">
@@ -212,16 +239,11 @@
             
             <div class="buttons">
                 <div class="button-row">
-                    <button class="btn btn-minus-10" onclick="changeAmount(-10)">−10</button>
-                    <button class="btn btn-plus-10" onclick="changeAmount(10)">+10</button>
-                </div>
-                <div class="button-row">
                     <button class="btn btn-minus-1" onclick="changeAmount(-1)">−</button>
                     <button class="btn btn-plus-1" onclick="changeAmount(1)">+</button>
                 </div>
             </div>
-            
-            <div class="info">
+                        <div class="info">
                 Цель: 1000₽ | Макс: 11111₽<br>
                 <span id="status">📈 Осталось: 1000₽</span>
             </div>
@@ -229,7 +251,6 @@
         </div>
     </div>
 
-    <!-- 🏆 ЭКРАН ТОПОВ -->
     <div id="topScreen" class="top-screen">
         <h1>🏆 Топ вложений</h1>
         <div class="container">
@@ -243,7 +264,8 @@
 
     <script>
         const firebaseConfig = {
-            apiKey: "AIzaSyAh3Gu_cbxJEZZY92K8m1VQE34mifAQGTY",            authDomain: "vldbotlesborbot-e82f4.firebaseapp.com",
+            apiKey: "AIzaSyAh3Gu_cbxJEZZY92K8m1VQE34mifAQGTY",
+            authDomain: "vldbotlesborbot-e82f4.firebaseapp.com",
             databaseURL: "https://vldbotlesborbot-e82f4-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "vldbotlesborbot-e82f4",
             storageBucket: "vldbotlesborbot-e82f4.firebasestorage.app",
@@ -256,71 +278,98 @@
 
         let currentUserName = '';
         let currentUserId = null;
+        let currentUserPassword = '';
         let currentAmount = 0;
+        let lastContributionAmount = 0;
         let isAdmin = false;
+        let userContributionRef = null;
+        let updateTimeout = null;
+        let changeTimeout = null;
         const targetAmount = 1000;
         const negativeMax = 11111;
         const maxDisplay = 11111;
         const SECRET_ADMIN_CODE = 'admin123';
+        const ADMIN_PASSWORD = '1';
+        const MAX_PROFILES = 3;
 
-        window.addEventListener('load', () => {
-            let progress = 0;
-            const loadingBar = document.getElementById('loadingBar');
-            const loadingPercent = document.getElementById('loadingPercent');
-            
-            const loadingInterval = setInterval(() => {
-                progress += 2;
-                if (progress > 100) progress = 100;
-                loadingBar.style.width = progress + '%';
-                loadingPercent.textContent = progress + '%';
-                if (progress >= 100) {
-                    clearInterval(loadingInterval);
-                    setTimeout(() => {
-                        document.getElementById('loadingScreen').style.display = 'none';
-                        checkLogin();
-                    }, 500);
-                }
-            }, 100);
+        document.getElementById('loginScreen').style.display = 'flex';
+        // 🔥 ПРОВЕРКА ЗАПОМНЕННОГО ПАРОЛЯ
+        window.addEventListener('load', function() {
+            var savedPassword = localStorage.getItem('bottleSavedPassword');
+            var rememberMe = localStorage.getItem('bottleRememberPassword');
+            if (savedPassword && rememberMe === 'true') {
+                document.getElementById('userPasswordInput').value = savedPassword;
+                document.getElementById('rememberPassword').checked = true;
+            }
         });
 
-        function checkLogin() {
-            const savedName = localStorage.getItem('bottleUserName');
-            const savedId = localStorage.getItem('bottleUserId');
-            if (savedName && savedId) {
-                currentUserName = savedName;
-                currentUserId = savedId;
-                isAdmin = (savedName.includes(':' + SECRET_ADMIN_CODE));
-                showMain();
-            } else {
-                showLogin();            }
-        }
-
         function showError(message) {
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('errorMessage').style.display = 'block';
+            var errorDiv = document.getElementById('errorMessage');
+            if (errorDiv) {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+            }
         }
 
         function hideError() {
-            document.getElementById('errorMessage').style.display = 'none';
+            var errorDiv = document.getElementById('errorMessage');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
         }
 
-        // 🔍 ПРОВЕРКА: ИМЯ ЗАНЯТО? (с исключением для админа)
-        function isNameTaken(name, excludeUserId = null) {
-            return new Promise((resolve) => {
-                db.ref('contributors').once('value', (snapshot) => {
-                    const contributors = snapshot.val();
+        // 🔥 ПОКАЗАТЬ/СКРЫТЬ ПАРОЛЬ
+        function togglePassword() {
+            var passwordInput = document.getElementById('userPasswordInput');
+            var toggleBtn = document.querySelector('.password-toggle');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        }
+
+        function isVlad(name) {
+            var vladVariations = ['влад', 'vlad', 'владик', 'владушка', 'владюша', 'владочка'];
+            var lowerName = name.toLowerCase();
+            return vladVariations.some(function(variation) {
+                return lowerName.indexOf(variation) !== -1;
+            });
+        }
+
+        // 🔥 ЗАПРЕЩЁННЫЕ ИМЕНА (admin и похожие)
+        function isAdminName(name) {
+            // 🔥 РАЗРЕШАЕМ admin123 (секретный код админа)            if (name.indexOf(':' + SECRET_ADMIN_CODE) !== -1) {
+                return false;
+            }
+            
+            var adminVariations = ['admin', 'админ', 'administrator', 'администратор', 'root', 'superuser', 'moderator', 'модератор'];
+            var lowerName = name.toLowerCase().trim();
+            return adminVariations.some(function(variation) {
+                return lowerName === variation || lowerName.indexOf(variation) !== -1;
+            });
+        }
+
+        function getProfileCount() {
+            var profiles = localStorage.getItem('bottleProfiles');
+            return profiles ? JSON.parse(profiles).length : 0;
+        }
+
+        function isNameTaken(name, excludeUserId) {
+            return new Promise(function(resolve) {
+                db.ref('contributors').once('value', function(snapshot) {
+                    var contributors = snapshot.val();
                     if (!contributors) {
                         resolve(false);
                         return;
                     }
                     
-                    // Проверяем все записи
-                    for (let id in contributors) {
-                        // Если это тот же пользователь (по ID) - пропускаем
+                    for (var id in contributors) {
                         if (excludeUserId && id === excludeUserId) {
                             continue;
                         }
-                        // Если имя совпадает - занято
                         if (contributors[id].name === name) {
                             resolve(true);
                             return;
@@ -331,184 +380,328 @@
             });
         }
 
-        // 😄 ПРОВЕРКА: ЭТО ВЛАД?
-        function isVlad(name) {
-            const vladVariations = ['влад', 'vlad', 'владик', 'владушка', 'владюша', 'владочка'];
-            const lowerName = name.toLowerCase();
-            return vladVariations.some(variation => lowerName.includes(variation));
-        }
-
-        async function login() {
+        function login() {
             hideError();
-            const input = document.getElementById('userNameInput').value.trim();
-            if (!input) { showError('Введите имя!'); return; }            
-            isAdmin = input.includes(':' + SECRET_ADMIN_CODE);
-            let displayName;
+            var input = document.getElementById('userNameInput').value.trim();
+            var password = document.getElementById('userPasswordInput').value.trim();
+            var rememberMe = document.getElementById('rememberPassword').checked;
+            
+            if (!input) { showError('Введите имя!'); return; }
+            if (!password) { showError('Введите пароль!'); return; }
+            
+            // 🔥 ПРОВЕРКА НА ЗАПРЕЩЁННОЕ ИМЯ (admin)
+            if (isAdminName(input)) {                showError('❌ Некорректное имя! Выберите другое.');
+                return;
+            }
+            
+            // 🔥 ПРОВЕРКА ПАРОЛЯ (мин. 5 символов, кроме админа)
+            var isAdminLogin = (input.indexOf(':' + SECRET_ADMIN_CODE) !== -1);
+            if (!isAdminLogin && password.length < 5) {
+                showError('Пароль должен быть не менее 5 символов!');
+                return;
+            }
+            
+            // 🔥 АДМИН ДОЛЖЕН ВВЕСТИ ПАРОЛЬ "1"
+            if (isAdminLogin && password !== ADMIN_PASSWORD) {
+                showError('❌ Неверный пароль админа!');
+                return;
+            }
+            
+            var profileCount = getProfileCount();
+            if (profileCount >= MAX_PROFILES) {
+                showError('❌ Превышен лимит профилей (макс. ' + MAX_PROFILES + ')');
+                return;
+            }
+            
+            isAdmin = isAdminLogin;
+            var displayName;
             if (isAdmin) {
                 displayName = input.split(':')[0];
             } else {
                 displayName = input;
             }
             
-            // 😄 ПОКАЗЫВАЕМ СООБЩЕНИЕ ДЛЯ ВЛАДА
-            const vladMessage = document.getElementById('vladMessage');
-            if (isVlad(displayName)) {
-                vladMessage.style.display = 'block';
+            // 🔥 СОХРАНЯЕМ ПАРОЛЬ ЕСЛИ ЗАПОМНИТЬ
+            if (rememberMe) {
+                localStorage.setItem('bottleSavedPassword', password);
+                localStorage.setItem('bottleRememberPassword', 'true');
             } else {
+                localStorage.removeItem('bottleSavedPassword');
+                localStorage.removeItem('bottleRememberPassword');
+            }
+            
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('loadingScreen').style.display = 'flex';
+            
+            var vladMessage = document.getElementById('vladMessage');
+            if (vladMessage && isVlad(displayName)) {
+                vladMessage.textContent = 'опять бухаешь сладкий? ❤️';
+                vladMessage.style.display = 'block';
+            } else if (vladMessage) {
                 vladMessage.style.display = 'none';
-            }
+            }            
+            var progress = 0;
+            var loadingBar = document.getElementById('loadingBar');
+            var loadingPercent = document.getElementById('loadingPercent');
             
-            // Получаем текущий ID пользователя (если он уже существует)
-            const savedId = localStorage.getItem('bottleUserId');
+            var interval = setInterval(function() {
+                progress += 2;
+                if (progress > 100) progress = 100;
+                
+                if (loadingBar) loadingBar.style.width = progress + '%';
+                if (loadingPercent) loadingPercent.textContent = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(function() {
+                        checkAndLogin(displayName, input, password);
+                    }, 500);
+                }
+            }, 100);
+        }
+
+        function checkAndLogin(displayName, fullInput, password) {
+            var savedId = localStorage.getItem('bottleUserId');
             
-            // 🔥 ПРОВЕРКА НА ДУБЛИКАТ (исключая текущего пользователя)
-            const taken = await isNameTaken(displayName, savedId);
-            if (taken) {
-                showError('❌ Имя "' + displayName + '" уже занято! Выберите другое.');
-                return;
-            }
-            
-            currentUserName = displayName;
-            currentUserId = Date.now().toString();
-            localStorage.setItem('bottleUserName', input);
-            localStorage.setItem('bottleUserId', currentUserId);
-            
-            db.ref('contributors/' + currentUserId).set({
-                name: currentUserName,
-                totalAmount: 0,
-                lastActive: Date.now()
-            }).then(() => {
-                showMain();
-            }).catch((error) => {
-                showError('Ошибка: ' + error.message);
+            isNameTaken(displayName, savedId).then(function(taken) {
+                if (taken) {
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    document.getElementById('loginScreen').style.display = 'flex';
+                    showError('❌ Имя "' + displayName + '" уже занято! Выберите другое.');
+                    return;
+                }
+                
+                currentUserName = displayName;
+                currentUserPassword = password;
+                currentUserId = savedId || Date.now().toString();
+                localStorage.setItem('bottleUserName', fullInput);
+                localStorage.setItem('bottleUserId', currentUserId);
+                localStorage.setItem('bottleUserPassword', password);
+                
+                var profiles = JSON.parse(localStorage.getItem('bottleProfiles') || '[]');
+                var existingIndex = profiles.findIndex(function(p) { return p.id === currentUserId; });
+                if (existingIndex === -1) {
+                    profiles.push({
+                        id: currentUserId,
+                        name: currentUserName,
+                        created: Date.now()
+                    });
+                    if (profiles.length > MAX_PROFILES) {
+                        profiles.shift();
+                    }                    localStorage.setItem('bottleProfiles', JSON.stringify(profiles));
+                }
+                
+                db.ref('contributors/' + currentUserId).set({
+                    name: currentUserName,
+                    password: password,
+                    totalAmount: 0,
+                    lastActive: Date.now()
+                }).then(function() {
+                    showMain();
+                }).catch(function(error) {
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    document.getElementById('loginScreen').style.display = 'flex';
+                    showError('Ошибка: ' + error.message);
+                });
             });
         }
 
-        // 🍔 МЕНЮ
         function toggleMenu() {
-            document.getElementById('sideMenu').classList.toggle('active');
-            document.getElementById('menuOverlay').classList.toggle('active');
+            var menu = document.getElementById('sideMenu');
+            var overlay = document.getElementById('menuOverlay');
+            if (menu) menu.classList.toggle('active');
+            if (overlay) overlay.classList.toggle('active');
         }
 
-        // 🏆 ПОКАЗАТЬ ТОПЫ        function showTop() {
+        function showTop() {
             toggleMenu();
             document.getElementById('mainScreen').style.display = 'none';
             document.getElementById('topScreen').style.display = 'block';
             loadTopList();
         }
 
-        // 📊 ГЛАВНЫЙ ЭКРАН
         function showMain() {
+            if (userContributionRef) {
+                db.ref('contributors/' + currentUserId + '/totalAmount').off('value', userContributionRef);
+            }
+            
+            if (window.activeInterval) {
+                clearInterval(window.activeInterval);
+            }
+            
+            document.getElementById('loadingScreen').style.display = 'none';
             document.getElementById('topScreen').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainScreen').style.display = 'block';
             document.getElementById('menuBtn').style.display = 'flex';
-            document.getElementById('currentUserName').textContent = currentUserName;
             
-            if (isAdmin) {
-                document.getElementById('adminPanel').style.display = 'block';
-                document.getElementById('adminBadge').style.display = 'inline-block';
-            } else {
-                document.getElementById('adminPanel').style.display = 'none';
-                document.getElementById('adminBadge').style.display = 'none';
-            }
+            var adminSection = document.getElementById('adminSection');
+            if (adminSection) {
+                adminSection.style.display = isAdmin ? 'block' : 'none';            }
             
-            db.ref('totalAmount').on('value', (snapshot) => {
+            db.ref('totalAmount').on('value', function(snapshot) {
                 currentAmount = snapshot.val() !== null ? snapshot.val() : 0;
                 updateDisplay();
                 document.getElementById('loading').style.display = 'none';
             });
             
+            userContributionRef = function(snapshot) {
+                var amount = snapshot.val() !== null ? snapshot.val() : 0;
+                updateContributionDisplay(amount);
+            };
+            
+            db.ref('contributors/' + currentUserId + '/totalAmount').on('value', userContributionRef);
+            
             if (currentUserId) {
                 db.ref('contributors/' + currentUserId + '/lastActive').set(Date.now());
-                window.activeInterval = setInterval(() => {
+                window.activeInterval = setInterval(function() {
                     db.ref('contributors/' + currentUserId + '/lastActive').set(Date.now());
                 }, 10000);
             }
         }
 
-        // 🔐 ЭКРАН ВХОДА
-        function showLogin() {
-            document.getElementById('mainScreen').style.display = 'none';
-            document.getElementById('topScreen').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('menuBtn').style.display = 'none';
+        // 🔥 ПЛАВНОЕ ОБНОВЛЕНИЕ ВКЛАДА
+        function updateContributionDisplay(amount) {
+            var contributionEl = document.getElementById('currentUserContribution');
+            
+            if (changeTimeout) {
+                clearTimeout(changeTimeout);
+            }
+            
+            changeTimeout = setTimeout(function() {
+                contributionEl.textContent = amount;
+                
+                // Анимация изменения
+                if (amount !== lastContributionAmount) {
+                    contributionEl.classList.add('changed');
+                    setTimeout(function() {
+                        contributionEl.classList.remove('changed');
+                    }, 300);
+                }
+                
+                lastContributionAmount = amount;
+            }, 50);
         }
 
-        // 🏆 ЗАГРУЗИТЬ ТОП
+        function deleteContributor(userId, userName) {
+            if (confirm('🗑️ Удалить "' + userName + '" из списка?')) {
+                db.ref('contributors/' + userId).remove().then(function() {
+                    if (userId === currentUserId) {                        setTimeout(function() { location.reload(); }, 1000);
+                    }
+                }).catch(function(error) {
+                    alert('❌ Ошибка: ' + error.message);
+                });
+            }
+        }
+
         function loadTopList() {
-            db.ref('contributors').once('value', (snapshot) => {
-                const contributors = snapshot.val();
-                const listDiv = document.getElementById('topList');                
+            db.ref('contributors').once('value', function(snapshot) {
+                var contributors = snapshot.val();
+                var listDiv = document.getElementById('topList');
+                
                 if (!contributors || Object.keys(contributors).length === 0) {
                     listDiv.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">Пока нет участников</div>';
                     return;
                 }
                 
-                const contributorsArray = Object.entries(contributors).map(([id, data]) => ({
-                    id, name: data.name || 'Аноним', amount: data.totalAmount || 0
-                }));
-                
-                contributorsArray.sort((a, b) => b.amount - a.amount);
-                
-                let html = '';
-                contributorsArray.forEach((contributor, index) => {
-                    const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤';
-                    const amountClass = contributor.amount < 0 ? 'negative' : '';
-                    html += `
-                        <div class="top-item">
-                            <span class="top-name">${medal} ${contributor.name}</span>
-                            <span class="top-amount ${amountClass}">${contributor.amount}₽</span>
-                        </div>
-                    `;
+                var contributorsArray = Object.entries(contributors).map(function(entry) {
+                    return {
+                        id: entry[0],
+                        name: entry[1].name || 'Аноним',
+                        amount: entry[1].totalAmount || 0
+                    };
                 });
                 
-                listDiv.innerHTML = html;
-            });
+                contributorsArray.sort(function(a, b) {
+                    return b.amount - a.amount;
+                });
+                
+                var html = '';
+                contributorsArray.forEach(function(contributor, index) {
+                    var medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤';
+                    var amountClass = contributor.amount < 0 ? 'negative' : '';
+                    var isCurrentUser = (contributor.id === currentUserId);
+                    
+                    html += '<div class="top-item" style="' + (isCurrentUser ? 'border: 2px solid #22c55e;' : '') + '">';
+                    html += '<div class="top-info">';
+                    html += '<span class="top-name">' + medal + ' ' + contributor.name + (isCurrentUser ? ' (вы)' : '') + '</span>';
+                    html += '<span class="top-amount ' + amountClass + '">' + contributor.amount + '₽</span>';
+                    html += '</div>';
+                    
+                    if (isAdmin) {
+                        html += '<button class="delete-btn" onclick="deleteContributor(\'' + contributor.id + '\', \'' + contributor.name + '\')">🗑️</button>';
+                    }
+                    
+                    html += '</div>';
+                });
+                
+                listDiv.innerHTML = html;            });
         }
 
-        // 🔄 СМЕНИТЬ ПОЛЬЗОВАТЕЛЯ
         function changeUser() {
             toggleMenu();
             if (confirm('🔄 Сменить пользователя?')) {
+                if (window.activeInterval) {
+                    clearInterval(window.activeInterval);
+                }
+                
                 localStorage.removeItem('bottleUserName');
                 localStorage.removeItem('bottleUserId');
+                localStorage.removeItem('bottleUserPassword');
                 currentUserName = '';
                 currentUserId = null;
+                currentUserPassword = '';
                 isAdmin = false;
-                showLogin();
+                
+                if (userContributionRef) {
+                    db.ref('contributors/' + currentUserId + '/totalAmount').off('value', userContributionRef);
+                }
+                
+                document.getElementById('mainScreen').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('menuBtn').style.display = 'none';
             }
         }
 
-        // 🚪 ВЫЙТИ
         function logout() {
             toggleMenu();
             if (confirm('🚪 Выйти из приложения?')) {
+                if (window.activeInterval) {
+                    clearInterval(window.activeInterval);
+                }
                 localStorage.removeItem('bottleUserName');
                 localStorage.removeItem('bottleUserId');
+                localStorage.removeItem('bottleUserPassword');
+                localStorage.removeItem('bottleProfiles');
                 location.reload();
             }
         }
-        // 🔐 АДМИН ФУНКЦИИ
+
         function resetTotalAmount() {
             if (confirm('⚠️ Обнулить общий счёт?')) {
-                db.ref('totalAmount').set(0).then(() => alert('✅ Счёт обнулён!'));
+                db.ref('totalAmount').set(0).then(function() {
+                    alert('✅ Счёт обнулён!');
+                    toggleMenu();
+                });
             }
         }
-
         function clearContributors() {
             if (confirm('⚠️ Удалить всех участников?')) {
-                db.ref('contributors').remove().then(() => location.reload());
+                db.ref('contributors').remove().then(function() {
+                    location.reload();
+                });
             }
         }
 
-        // 📊 ОБНОВЛЕНИЕ
         function updateDisplay() {
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            const status = document.getElementById('status');
+            var progressFill = document.getElementById('progressFill');
+            var progressText = document.getElementById('progressText');
+            var status = document.getElementById('status');
+            
             progressText.textContent = formatNumber(currentAmount);
-            let percentage = currentAmount >= targetAmount ? 100 : currentAmount <= 0 ? 0 : (currentAmount / targetAmount) * 100;
+            
+            var percentage = currentAmount >= targetAmount ? 100 : currentAmount <= 0 ? 0 : (currentAmount / targetAmount) * 100;
+            
             if (currentAmount < 0) {
                 percentage = Math.min(100, (Math.abs(currentAmount) / negativeMax) * 100);
                 progressFill.classList.add('negative');
@@ -522,6 +715,7 @@
                 progressFill.classList.remove('negative');
                 status.textContent = '✅ Цель достигнута! +' + (currentAmount - targetAmount) + '₽';
             }
+            
             progressFill.style.width = percentage + '%';
         }
 
@@ -532,21 +726,29 @@
         }
 
         function changeAmount(delta) {
-            const newTotalAmount = currentAmount + delta;
+            var newTotalAmount = currentAmount + delta;
             if (newTotalAmount > 11111 || newTotalAmount < -11111) {
                 alert('Достигнут лимит!');
                 return;
             }
-            db.ref('totalAmount').set(newTotalAmount);            if (currentUserId) {
-                db.ref('contributors/' + currentUserId).transaction((data) => {
-                    if (data) {
-                        data.totalAmount = (data.totalAmount || 0) + delta;
-                        data.lastActive = Date.now();
-                    }
-                    return data;
-                });
+            
+            // 🔥 ПЛАВНОЕ ОБНОВЛЕНИЕ (debounce 150ms)
+            if (updateTimeout) {                clearTimeout(updateTimeout);
             }
-            if (navigator.vibrate) navigator.vibrate(50);
+            
+            updateTimeout = setTimeout(function() {
+                db.ref('totalAmount').set(newTotalAmount);
+                if (currentUserId) {
+                    db.ref('contributors/' + currentUserId).transaction(function(data) {
+                        if (data) {
+                            data.totalAmount = (data.totalAmount || 0) + delta;
+                            data.lastActive = Date.now();
+                        }
+                        return data;
+                    });
+                }
+                if (navigator.vibrate) navigator.vibrate(50);
+            }, 150);
         }
     </script>
 </body>
