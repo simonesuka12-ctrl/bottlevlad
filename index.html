@@ -98,7 +98,6 @@
         
         .main-screen { display: none; width: 100%; max-width: 400px; padding-top: 20px; }        .container { width: 100%; }
         
-        /* 🔥 СООБЩЕНИЕ "СПАСИБО РЕБЯТА" */
         .thank-message {
             background: linear-gradient(135deg, #ffd700, #ffed4e);
             color: #d4a017;
@@ -145,8 +144,8 @@
         .top-amount { font-weight: bold; color: #22c55e; margin-right: 10px; }
         .top-amount.negative { color: #ef4444; }
         .delete-btn { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 5px; padding: 5px 10px; font-size: 0.9em; cursor: pointer; transition: transform 0.1s; }
-        .delete-btn:active { transform: scale(0.95); }        .back-btn { margin-top: 20px; padding: 12px; background: linear-gradient(135deg, #6b7280, #4b5563); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; }
-        .back-btn:active { transform: scale(0.98); }
+        .delete-btn:active { transform: scale(0.95); }
+        .back-btn { margin-top: 20px; padding: 12px; background: linear-gradient(135deg, #6b7280, #4b5563); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; }        .back-btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
@@ -192,11 +191,10 @@
     <div id="mainScreen" class="main-screen">
         <h1>💰 Сбор на бутылку Владу</h1>
         <div class="container">
-            <!-- 🔥 СООБЩЕНИЕ "СПАСИБО РЕБЯТА" -->
             <div id="thankMessage" class="thank-message">
-                ❤️ Спасибо ребята за бутылку! ❤️            </div>
-            
-            <div class="progress-container">
+                ❤️ Спасибо ребята за бутылку! ❤️
+            </div>
+                        <div class="progress-container">
                 <div class="progress-fill" id="progressFill"></div>
                 <div class="progress-text" id="progressText">Загрузка...</div>
             </div>
@@ -243,23 +241,58 @@
 
         let currentUserName = '';
         let currentUserId = null;
-        let currentAmount = 0;        let lastThankAmount = 0;
-        let thankTimeout = null;
-        let isAdmin = false;
+        let currentAmount = 0;
+        let lastThankAmount = 0;
+        let thankTimeout = null;        let isAdmin = false;
         let updateTimeout = null;
         const targetAmount = 1000;
         const negativeMax = 11111;
         const maxDisplay = 11111;
         const SECRET_ADMIN_CODE = 'admin123';
         const MAX_PROFILES = 3;
-        const THANK_EVERY = 86; // 🔥 КАЖДЫЕ 86 РУБЛЕЙ
+        const THANK_EVERY = 86;
 
-        document.getElementById('loginScreen').style.display = 'flex';
+        // 🔥 ПРОВЕРКА АВТО-ВХОДА ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+        window.addEventListener('load', function() {
+            var savedName = localStorage.getItem('bottleUserName');
+            var savedId = localStorage.getItem('bottleUserId');
+            
+            if (savedName && savedId) {
+                // 🔥 АВТО-ВХОД - ПОКАЗЫВАЕМ ГЛАВНЫЙ ЭКРАН СРАЗУ
+                currentUserName = savedName.indexOf(':' + SECRET_ADMIN_CODE) !== -1 ? savedName.split(':')[0] : savedName;
+                currentUserId = savedId;
+                isAdmin = (savedName.indexOf(':' + SECRET_ADMIN_CODE) !== -1);
+                
+                document.getElementById('loadingScreen').style.display = 'flex';
+                
+                // Короткая загрузка для красоты
+                var progress = 0;
+                var loadingBar = document.getElementById('loadingBar');
+                var loadingPercent = document.getElementById('loadingPercent');
+                
+                var interval = setInterval(function() {
+                    progress += 10;
+                    if (progress > 100) progress = 100;
+                    
+                    if (loadingBar) loadingBar.style.width = progress + '%';
+                    if (loadingPercent) loadingPercent.textContent = progress + '%';
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        setTimeout(function() {
+                            showMain();
+                        }, 300);
+                    }
+                }, 50);
+            } else {
+                // 🔥 НЕТ СОХРАНЁННЫХ ДАННЫХ - ПОКАЗЫВАЕМ ЭКРАН ВХОДА
+                document.getElementById('loginScreen').style.display = 'flex';
+            }
+        });
 
         function showError(message) {
             var errorDiv = document.getElementById('errorMessage');
-            if (errorDiv) {
-                errorDiv.textContent = message;
+            if (errorDiv) {                errorDiv.textContent = message;
                 errorDiv.style.display = 'block';
             }
         }
@@ -292,7 +325,8 @@
         }
 
         function getProfileCount() {
-            var profiles = localStorage.getItem('bottleProfiles');            return profiles ? JSON.parse(profiles).length : 0;
+            var profiles = localStorage.getItem('bottleProfiles');
+            return profiles ? JSON.parse(profiles).length : 0;
         }
 
         function isNameTaken(name, excludeUserId) {
@@ -307,8 +341,7 @@
                     for (var id in contributors) {
                         if (excludeUserId && id === excludeUserId) {
                             continue;
-                        }
-                        if (contributors[id].name === name) {
+                        }                        if (contributors[id].name === name) {
                             resolve(true);
                             return;
                         }
@@ -341,7 +374,8 @@
                 displayName = input.split(':')[0];
             } else {
                 displayName = input;
-            }            
+            }
+            
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('loadingScreen').style.display = 'flex';
             
@@ -356,8 +390,7 @@
             var progress = 0;
             var loadingBar = document.getElementById('loadingBar');
             var loadingPercent = document.getElementById('loadingPercent');
-            
-            var interval = setInterval(function() {
+                        var interval = setInterval(function() {
                 progress += 2;
                 if (progress > 100) progress = 100;
                 
@@ -390,7 +423,8 @@
                 localStorage.setItem('bottleUserId', currentUserId);
                 
                 var profiles = JSON.parse(localStorage.getItem('bottleProfiles') || '[]');
-                var existingIndex = profiles.findIndex(function(p) { return p.id === currentUserId; });                if (existingIndex === -1) {
+                var existingIndex = profiles.findIndex(function(p) { return p.id === currentUserId; });
+                if (existingIndex === -1) {
                     profiles.push({
                         id: currentUserId,
                         name: currentUserName,
@@ -405,8 +439,7 @@
                 db.ref('contributors/' + currentUserId).set({
                     name: currentUserName,
                     totalAmount: 0,
-                    lastActive: Date.now()
-                }).then(function() {
+                    lastActive: Date.now()                }).then(function() {
                     showMain();
                 }).catch(function(error) {
                     document.getElementById('loadingScreen').style.display = 'none';
@@ -439,7 +472,8 @@
             document.getElementById('topScreen').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainScreen').style.display = 'block';
-            document.getElementById('menuBtn').style.display = 'flex';            
+            document.getElementById('menuBtn').style.display = 'flex';
+            
             var adminSection = document.getElementById('adminSection');
             if (adminSection) {
                 adminSection.style.display = isAdmin ? 'block' : 'none';
@@ -448,15 +482,13 @@
             db.ref('totalAmount').on('value', function(snapshot) {
                 var newAmount = snapshot.val() !== null ? snapshot.val() : 0;
                 
-                // 🔥 ПРОВЕРКА НА "СПАСИБО РЕБЯТА" (каждые 86₽ в плюсе)
                 if (newAmount > 0 && newAmount >= lastThankAmount + THANK_EVERY) {
                     showThankMessage();
                     lastThankAmount = newAmount;
                 }
                 
                 currentAmount = newAmount;
-                updateDisplay();
-                document.getElementById('loading').style.display = 'none';
+                updateDisplay();                document.getElementById('loading').style.display = 'none';
             });
             
             if (currentUserId) {
@@ -467,13 +499,11 @@
             }
         }
 
-        // 🔥 ПОКАЗАТЬ СООБЩЕНИЕ "СПАСИБО РЕБЯТА"
         function showThankMessage() {
             var thankMsg = document.getElementById('thankMessage');
             if (thankMsg) {
                 thankMsg.classList.add('show');
                 
-                // 🔥 СКРЫТЬ ЧЕРЕЗ 15 СЕКУНД
                 if (thankTimeout) {
                     clearTimeout(thankTimeout);
                 }
@@ -488,7 +518,8 @@
                 db.ref('contributors/' + userId).remove().then(function() {
                     if (userId === currentUserId) {
                         setTimeout(function() { location.reload(); }, 1000);
-                    }                }).catch(function(error) {
+                    }
+                }).catch(function(error) {
                     alert('❌ Ошибка: ' + error.message);
                 });
             }
@@ -506,8 +537,7 @@
                 
                 var contributorsArray = Object.entries(contributors).map(function(entry) {
                     return {
-                        id: entry[0],
-                        name: entry[1].name || 'Аноним',
+                        id: entry[0],                        name: entry[1].name || 'Аноним',
                         amount: entry[1].totalAmount || 0
                     };
                 });
@@ -538,6 +568,7 @@
                 listDiv.innerHTML = html;
             });
         }
+
         function changeUser() {
             toggleMenu();
             if (confirm('🔄 Сменить пользователя?')) {
@@ -556,7 +587,6 @@
                 document.getElementById('menuBtn').style.display = 'none';
             }
         }
-
         function logout() {
             toggleMenu();
             if (confirm('🚪 Выйти из приложения?')) {
@@ -586,6 +616,7 @@
                 });
             }
         }
+
         function updateDisplay() {
             var progressFill = document.getElementById('progressFill');
             var progressText = document.getElementById('progressText');
@@ -604,8 +635,7 @@
                 percentage = (currentAmount / targetAmount) * 100;
                 progressFill.classList.remove('negative');
                 status.textContent = '📈 Осталось: ' + (targetAmount - currentAmount) + '₽';
-            } else if (currentAmount >= maxDisplay) {
-                percentage = 100;
+            } else if (currentAmount >= maxDisplay) {                percentage = 100;
                 status.textContent = '🚀 БЕСКОНЕЧНОСТЬ!';
             } else {
                 percentage = 100;
@@ -635,7 +665,8 @@
             
             updateTimeout = setTimeout(function() {
                 db.ref('totalAmount').set(newTotalAmount);
-                if (currentUserId) {                    db.ref('contributors/' + currentUserId).transaction(function(data) {
+                if (currentUserId) {
+                    db.ref('contributors/' + currentUserId).transaction(function(data) {
                         if (data) {
                             data.totalAmount = (data.totalAmount || 0) + delta;
                             data.lastActive = Date.now();
