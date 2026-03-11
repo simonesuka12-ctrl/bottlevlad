@@ -79,7 +79,7 @@
             color: #666;
         }
         
-        h1 { margin-bottom: 30px; text-align: center; font-size: 1.5em; color: #888; }
+        h1 { margin-bottom: 40px; text-align: center; font-size: 1.5em; color: #888; }
         
         .login-screen { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 400px; padding-top: 50px; }
         .login-input { width: 100%; padding: 15px; font-size: 1.2em; border: 2px solid #d1d1d1; border-radius: 10px; margin-bottom: 15px; text-align: center; }
@@ -97,29 +97,29 @@
         .loading-text { color: #666; font-size: 0.9em; }
         
         .main-screen { display: none; width: 100%; max-width: 400px; padding-top: 20px; }        .container { width: 100%; }
-        .user-info { 
-            padding: 10px; 
-            margin-bottom: 30px; 
-            text-align: center; 
-            font-size: 0.9em;
-            background: transparent;
-        }
-        .contribution-label {
-            color: #666;
-            margin-right: 5px;
-        }
-        .contribution-amount {
-            font-size: 1.3em;
+        
+        /* 🔥 СООБЩЕНИЕ "СПАСИБО РЕБЯТА" */
+        .thank-message {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #d4a017;
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-size: 1.2em;
             font-weight: bold;
-            color: #22c55e;
-            transition: color 0.3s ease;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            animation: pulse 2s infinite;
+            display: none;
         }
-        .contribution-amount.negative {
-            color: #ef4444;
+        .thank-message.show {
+            display: block;
         }
-        .contribution-amount.positive {
-            color: #22c55e;
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
+        
         .progress-container { width: 100%; height: 80px; background: #e5e5e5; border-radius: 40px; overflow: hidden; position: relative; margin-bottom: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 3px solid #d1d1d1; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); position: absolute; left: 0; top: 0; box-shadow: 0 0 20px rgba(34, 197, 94, 0.3); transition: width 0.5s ease-out; }
         .progress-fill.negative { background: linear-gradient(90deg, #f87171, #ef4444); box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); left: auto; right: 0; }
@@ -192,10 +192,10 @@
     <div id="mainScreen" class="main-screen">
         <h1>💰 Сбор на бутылку Владу</h1>
         <div class="container">
-            <div class="user-info">
-                <span class="contribution-label">👤 Ваш вклад:</span>
-                <span id="currentUserContribution" class="contribution-amount">0</span><span>₽</span>            </div>
-
+            <!-- 🔥 СООБЩЕНИЕ "СПАСИБО РЕБЯТА" -->
+            <div id="thankMessage" class="thank-message">
+                ❤️ Спасибо ребята за бутылку! ❤️            </div>
+            
             <div class="progress-container">
                 <div class="progress-fill" id="progressFill"></div>
                 <div class="progress-text" id="progressText">Загрузка...</div>
@@ -209,7 +209,7 @@
             </div>
             
             <div class="info">
-                Цель: 1000₽ | Макс: 11111₽ | Мин: -11111₽<br>
+                Цель: 1000₽<br>
                 <span id="status">📈 Осталось: 1000₽</span>
             </div>
             <div id="loading">🔄 Синхронизация...</div>
@@ -243,18 +243,16 @@
 
         let currentUserName = '';
         let currentUserId = null;
-        let currentAmount = 0;        let currentContribution = 0;
-        let targetContribution = 0;
+        let currentAmount = 0;        let lastThankAmount = 0;
+        let thankTimeout = null;
         let isAdmin = false;
-        let userContributionRef = null;
         let updateTimeout = null;
-        let animationFrame = null;
-        let lastAnimationTime = 0;
         const targetAmount = 1000;
         const negativeMax = 11111;
         const maxDisplay = 11111;
         const SECRET_ADMIN_CODE = 'admin123';
         const MAX_PROFILES = 3;
+        const THANK_EVERY = 86; // 🔥 КАЖДЫЕ 86 РУБЛЕЙ
 
         document.getElementById('loginScreen').style.display = 'flex';
 
@@ -292,9 +290,9 @@
                 return lowerName === variation || lowerName.indexOf(variation) !== -1;
             });
         }
+
         function getProfileCount() {
-            var profiles = localStorage.getItem('bottleProfiles');
-            return profiles ? JSON.parse(profiles).length : 0;
+            var profiles = localStorage.getItem('bottleProfiles');            return profiles ? JSON.parse(profiles).length : 0;
         }
 
         function isNameTaken(name, excludeUserId) {
@@ -341,9 +339,9 @@
             var displayName;
             if (isAdmin) {
                 displayName = input.split(':')[0];
-            } else {                displayName = input;
-            }
-            
+            } else {
+                displayName = input;
+            }            
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('loadingScreen').style.display = 'flex';
             
@@ -390,9 +388,9 @@
                 currentUserId = savedId || Date.now().toString();
                 localStorage.setItem('bottleUserName', fullInput);
                 localStorage.setItem('bottleUserId', currentUserId);
-                                var profiles = JSON.parse(localStorage.getItem('bottleProfiles') || '[]');
-                var existingIndex = profiles.findIndex(function(p) { return p.id === currentUserId; });
-                if (existingIndex === -1) {
+                
+                var profiles = JSON.parse(localStorage.getItem('bottleProfiles') || '[]');
+                var existingIndex = profiles.findIndex(function(p) { return p.id === currentUserId; });                if (existingIndex === -1) {
                     profiles.push({
                         id: currentUserId,
                         name: currentUserName,
@@ -433,38 +431,33 @@
         }
 
         function showMain() {
-            if (userContributionRef) {
-                db.ref('contributors/' + currentUserId + '/totalAmount').off('value', userContributionRef);
-            }
-            
             if (window.activeInterval) {
                 clearInterval(window.activeInterval);
-            }            
+            }
+            
             document.getElementById('loadingScreen').style.display = 'none';
             document.getElementById('topScreen').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainScreen').style.display = 'block';
-            document.getElementById('menuBtn').style.display = 'flex';
-            
+            document.getElementById('menuBtn').style.display = 'flex';            
             var adminSection = document.getElementById('adminSection');
             if (adminSection) {
                 adminSection.style.display = isAdmin ? 'block' : 'none';
             }
             
             db.ref('totalAmount').on('value', function(snapshot) {
-                currentAmount = snapshot.val() !== null ? snapshot.val() : 0;
+                var newAmount = snapshot.val() !== null ? snapshot.val() : 0;
+                
+                // 🔥 ПРОВЕРКА НА "СПАСИБО РЕБЯТА" (каждые 86₽ в плюсе)
+                if (newAmount > 0 && newAmount >= lastThankAmount + THANK_EVERY) {
+                    showThankMessage();
+                    lastThankAmount = newAmount;
+                }
+                
+                currentAmount = newAmount;
                 updateDisplay();
                 document.getElementById('loading').style.display = 'none';
             });
-            
-            userContributionRef = function(snapshot) {
-                var amount = snapshot.val() !== null ? snapshot.val() : 0;
-                // 🔥 УСТАНОВКА ЦЕЛЕВОГО ЗНАЧЕНИЯ ДЛЯ ПЛАВНОЙ АНИМАЦИИ
-                targetContribution = amount;
-                animateContributionSmooth();
-            };
-            
-            db.ref('contributors/' + currentUserId + '/totalAmount').on('value', userContributionRef);
             
             if (currentUserId) {
                 db.ref('contributors/' + currentUserId + '/lastActive').set(Date.now());
@@ -474,58 +467,20 @@
             }
         }
 
-        // 🔥 ОЧЕНЬ ПЛАВНАЯ АНИМАЦИЯ ЧИСЕЛ
-        function animateContributionSmooth() {
-            var contributionEl = document.getElementById('currentUserContribution');
-            var now = Date.now();
-            
-            // Минимум 100ms между анимациями чтобы не лагало
-            if (now - lastAnimationTime < 100) {
-                if (animationFrame) {
-                    cancelAnimationFrame(animationFrame);
+        // 🔥 ПОКАЗАТЬ СООБЩЕНИЕ "СПАСИБО РЕБЯТА"
+        function showThankMessage() {
+            var thankMsg = document.getElementById('thankMessage');
+            if (thankMsg) {
+                thankMsg.classList.add('show');
+                
+                // 🔥 СКРЫТЬ ЧЕРЕЗ 15 СЕКУНД
+                if (thankTimeout) {
+                    clearTimeout(thankTimeout);
                 }
-                animationFrame = requestAnimationFrame(function() {
-                    animateContributionSmooth();
-                });
-                return;
-            }            
-            lastAnimationTime = now;
-            
-            var startValue = currentContribution;
-            var endValue = targetContribution;
-            var duration = 400; // 400ms для плавности
-            var startTime = null;
-            
-            function step(timestamp) {
-                if (!startTime) startTime = timestamp;
-                var elapsed = timestamp - startTime;
-                var progress = Math.min(elapsed / duration, 1);
-                
-                // 🔥 ПЛАВНЫЙ EASING (ease-out cubic)
-                var easeProgress = 1 - Math.pow(1 - progress, 3);
-                
-                var currentValue = Math.round(startValue + (endValue - startValue) * easeProgress);
-                contributionEl.textContent = currentValue;
-                
-                // Обновляем цвет
-                contributionEl.classList.remove('negative', 'positive');
-                if (currentValue < 0) {
-                    contributionEl.classList.add('negative');
-                } else if (currentValue > 0) {
-                    contributionEl.classList.add('positive');
-                }
-                
-                if (progress < 1) {
-                    animationFrame = requestAnimationFrame(step);
-                } else {
-                    currentContribution = endValue;
-                }
+                thankTimeout = setTimeout(function() {
+                    thankMsg.classList.remove('show');
+                }, 15000);
             }
-            
-            if (animationFrame) {
-                cancelAnimationFrame(animationFrame);
-            }
-            animationFrame = requestAnimationFrame(step);
         }
 
         function deleteContributor(userId, userName) {
@@ -533,11 +488,11 @@
                 db.ref('contributors/' + userId).remove().then(function() {
                     if (userId === currentUserId) {
                         setTimeout(function() { location.reload(); }, 1000);
-                    }
-                }).catch(function(error) {
+                    }                }).catch(function(error) {
                     alert('❌ Ошибка: ' + error.message);
                 });
-            }        }
+            }
+        }
 
         function loadTopList() {
             db.ref('contributors').once('value', function(snapshot) {
@@ -583,10 +538,10 @@
                 listDiv.innerHTML = html;
             });
         }
-
         function changeUser() {
             toggleMenu();
-            if (confirm('🔄 Сменить пользователя?')) {                if (window.activeInterval) {
+            if (confirm('🔄 Сменить пользователя?')) {
+                if (window.activeInterval) {
                     clearInterval(window.activeInterval);
                 }
                 
@@ -595,10 +550,6 @@
                 currentUserName = '';
                 currentUserId = null;
                 isAdmin = false;
-                
-                if (userContributionRef) {
-                    db.ref('contributors/' + currentUserId + '/totalAmount').off('value', userContributionRef);
-                }
                 
                 document.getElementById('mainScreen').style.display = 'none';
                 document.getElementById('loginScreen').style.display = 'flex';
@@ -642,17 +593,14 @@
             
             progressText.textContent = formatNumber(currentAmount);
             
-            // 🔥 РАСЧЁТ ПРОЦЕНТА С УЧЁТОМ ОТРИЦАТЕЛЬНЫХ ЗНАЧЕНИЙ ДО -11111
             var percentage;
             
             if (currentAmount < 0) {
-                // От -11111 до 0 = 0% до 50%
                 percentage = (Math.abs(currentAmount) / negativeMax) * 50;
                 percentage = Math.min(50, percentage);
                 progressFill.classList.add('negative');
                 status.textContent = '📉 Долг: ' + Math.abs(currentAmount) + '₽';
             } else if (currentAmount < targetAmount) {
-                // От 0 до 1000 = 0% до 100%
                 percentage = (currentAmount / targetAmount) * 100;
                 progressFill.classList.remove('negative');
                 status.textContent = '📈 Осталось: ' + (targetAmount - currentAmount) + '₽';
@@ -660,7 +608,6 @@
                 percentage = 100;
                 status.textContent = '🚀 БЕСКОНЕЧНОСТЬ!';
             } else {
-                // Больше 1000
                 percentage = 100;
                 progressFill.classList.remove('negative');
                 status.textContent = '✅ Цель достигнута! +' + (currentAmount - targetAmount) + '₽';
@@ -677,18 +624,18 @@
 
         function changeAmount(delta) {
             var newTotalAmount = currentAmount + delta;
-            if (newTotalAmount > 11111 || newTotalAmount < -11111) {
+            if (newTotalAmount > maxDisplay || newTotalAmount < -negativeMax) {
                 alert('Достигнут лимит!');
                 return;
             }
             
             if (updateTimeout) {
                 clearTimeout(updateTimeout);
-            }            
+            }
+            
             updateTimeout = setTimeout(function() {
                 db.ref('totalAmount').set(newTotalAmount);
-                if (currentUserId) {
-                    db.ref('contributors/' + currentUserId).transaction(function(data) {
+                if (currentUserId) {                    db.ref('contributors/' + currentUserId).transaction(function(data) {
                         if (data) {
                             data.totalAmount = (data.totalAmount || 0) + delta;
                             data.lastActive = Date.now();
