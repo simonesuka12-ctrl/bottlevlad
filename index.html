@@ -83,69 +83,44 @@
         
         .login-screen { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 400px; padding-top: 50px; }
         .login-input { width: 100%; padding: 15px; font-size: 1.2em; border: 2px solid #d1d1d1; border-radius: 10px; margin-bottom: 15px; text-align: center; }
-        .password-container {
-            position: relative;
-            width: 100%;
-            margin-bottom: 15px;
-        }
-        .password-input {
-            width: 100%;
-            padding: 15px;
-            font-size: 1.2em;
-            border: 2px solid #d1d1d1;
-            border-radius: 10px;
-            text-align: center;
-            padding-right: 50px;
-        }        .password-toggle {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            font-size: 1.2em;
-            cursor: pointer;
-            padding: 5px;
-            opacity: 0.5;
-        }
-        .password-toggle:hover { opacity: 1; }
         .login-btn { width: 100%; padding: 15px; font-size: 1.2em; font-weight: bold; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
         .login-btn:active { transform: scale(0.98); }
         .error-message { background: #fee; color: #c00; padding: 10px; border-radius: 8px; margin: 10px 0; display: none; }
         .secret-hint { color: #999; font-size: 0.75em; margin-top: 10px; font-style: italic; text-align: center; }
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: #666;
-        }
-        .remember-me input {
-            width: 18px;
-            height: 18px;
-        }
         
         .loading-screen { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 400px; padding-top: 100px; }
         .loading-title { font-size: 1.5em; margin-bottom: 20px; text-align: center; color: #888; }
         .vlad-message { color: #000; padding: 15px 20px; margin-bottom: 30px; font-size: 1.1em; font-weight: bold; text-align: center; }
         .loading-bar-container { width: 80%; height: 40px; background: #e5e5e5; border-radius: 20px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid #d1d1d1; }
         .loading-bar { height: 100%; background: linear-gradient(90deg, #fbbf24, #f59e0b); width: 0%; transition: width 0.3s ease-out; box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
-        .loading-percent { font-size: 2em; font-weight: bold; color: #f59e0b; margin-bottom: 10px; transition: color 0.3s; }
+        .loading-percent { font-size: 2em; font-weight: bold; color: #f59e0b; margin-bottom: 10px; }
         .loading-text { color: #666; font-size: 0.9em; }
         
-        .main-screen { display: none; width: 100%; max-width: 400px; padding-top: 20px; }
-        .container { width: 100%; }
-        .user-info { background: #f0f0f0; padding: 10px; border-radius: 8px; margin-bottom: 30px; text-align: center; font-size: 0.9em; }
+        .main-screen { display: none; width: 100%; max-width: 400px; padding-top: 20px; }        .container { width: 100%; }
+        .user-info { 
+            padding: 10px; 
+            margin-bottom: 30px; 
+            text-align: center; 
+            font-size: 0.9em;
+            background: transparent;
+        }
+        .contribution-label {
+            color: #666;
+            margin-right: 5px;
+        }
         .contribution-amount {
             font-size: 1.3em;
             font-weight: bold;
             color: #22c55e;
-            transition: color 0.2s ease;
+            transition: color 0.3s ease;
         }
-        .contribution-amount.changed {
-            color: #f59e0b;
-        }        .progress-container { width: 100%; height: 80px; background: #e5e5e5; border-radius: 40px; overflow: hidden; position: relative; margin-bottom: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 3px solid #d1d1d1; }
+        .contribution-amount.negative {
+            color: #ef4444;
+        }
+        .contribution-amount.positive {
+            color: #22c55e;
+        }
+        .progress-container { width: 100%; height: 80px; background: #e5e5e5; border-radius: 40px; overflow: hidden; position: relative; margin-bottom: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 3px solid #d1d1d1; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); position: absolute; left: 0; top: 0; box-shadow: 0 0 20px rgba(34, 197, 94, 0.3); transition: width 0.5s ease-out; }
         .progress-fill.negative { background: linear-gradient(90deg, #f87171, #ef4444); box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); left: auto; right: 0; }
         .progress-text { position: relative; z-index: 10; font-size: 2.5em; font-weight: bold; color: #1a1a1a; text-shadow: 0 2px 4px rgba(255,255,255,0.8); text-align: center; line-height: 74px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 10px; }
@@ -170,8 +145,7 @@
         .top-amount { font-weight: bold; color: #22c55e; margin-right: 10px; }
         .top-amount.negative { color: #ef4444; }
         .delete-btn { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 5px; padding: 5px 10px; font-size: 0.9em; cursor: pointer; transition: transform 0.1s; }
-        .delete-btn:active { transform: scale(0.95); }
-        .back-btn { margin-top: 20px; padding: 12px; background: linear-gradient(135deg, #6b7280, #4b5563); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; }
+        .delete-btn:active { transform: scale(0.95); }        .back-btn { margin-top: 20px; padding: 12px; background: linear-gradient(135deg, #6b7280, #4b5563); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; }
         .back-btn:active { transform: scale(0.98); }
     </style>
 </head>
@@ -194,23 +168,13 @@
             <div class="admin-section-title">⚙️ Администрирование</div>
             <div class="menu-item" onclick="resetTotalAmount()">🗑️ Обнулить счёт</div>
             <div class="menu-item danger" onclick="clearContributors()">🧹 Удалить всех участников</div>
-        </div>    </div>
+        </div>
+    </div>
 
     <div id="loginScreen" class="login-screen">
         <h1>💰 Сбор на бутылку Владу</h1>
         <div id="errorMessage" class="error-message"></div>
         <input type="text" id="userNameInput" class="login-input" placeholder="Введите ваше имя" maxlength="30">
-        
-        <div class="password-container">
-            <input type="password" id="userPasswordInput" class="password-input" placeholder="Придумайте пароль (мин. 5 символов)" maxlength="20">
-            <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
-        </div>
-        
-        <div class="remember-me">
-            <input type="checkbox" id="rememberPassword">
-            <label for="rememberPassword">Запомнить пароль</label>
-        </div>
-        
         <button id="loginButton" class="login-btn" onclick="login()">Начать сбор!</button>
         <div class="secret-hint">💡 Максимум 3 профиля с одного устройства</div>
     </div>
@@ -229,8 +193,8 @@
         <h1>💰 Сбор на бутылку Владу</h1>
         <div class="container">
             <div class="user-info">
-                👤 Ваш вклад: <span id="currentUserContribution" class="contribution-amount">0</span>₽
-            </div>
+                <span class="contribution-label">👤 Ваш вклад:</span>
+                <span id="currentUserContribution" class="contribution-amount">0</span><span>₽</span>            </div>
 
             <div class="progress-container">
                 <div class="progress-fill" id="progressFill"></div>
@@ -243,8 +207,9 @@
                     <button class="btn btn-plus-1" onclick="changeAmount(1)">+</button>
                 </div>
             </div>
-                        <div class="info">
-                Цель: 1000₽ | Макс: 11111₽<br>
+            
+            <div class="info">
+                Цель: 1000₽ | Макс: 11111₽ | Мин: -11111₽<br>
                 <span id="status">📈 Осталось: 1000₽</span>
             </div>
             <div id="loading">🔄 Синхронизация...</div>
@@ -278,30 +243,20 @@
 
         let currentUserName = '';
         let currentUserId = null;
-        let currentUserPassword = '';
-        let currentAmount = 0;
-        let lastContributionAmount = 0;
+        let currentAmount = 0;        let currentContribution = 0;
+        let targetContribution = 0;
         let isAdmin = false;
         let userContributionRef = null;
         let updateTimeout = null;
-        let changeTimeout = null;
+        let animationFrame = null;
+        let lastAnimationTime = 0;
         const targetAmount = 1000;
         const negativeMax = 11111;
         const maxDisplay = 11111;
         const SECRET_ADMIN_CODE = 'admin123';
-        const ADMIN_PASSWORD = '1';
         const MAX_PROFILES = 3;
 
         document.getElementById('loginScreen').style.display = 'flex';
-        // 🔥 ПРОВЕРКА ЗАПОМНЕННОГО ПАРОЛЯ
-        window.addEventListener('load', function() {
-            var savedPassword = localStorage.getItem('bottleSavedPassword');
-            var rememberMe = localStorage.getItem('bottleRememberPassword');
-            if (savedPassword && rememberMe === 'true') {
-                document.getElementById('userPasswordInput').value = savedPassword;
-                document.getElementById('rememberPassword').checked = true;
-            }
-        });
 
         function showError(message) {
             var errorDiv = document.getElementById('errorMessage');
@@ -318,19 +273,6 @@
             }
         }
 
-        // 🔥 ПОКАЗАТЬ/СКРЫТЬ ПАРОЛЬ
-        function togglePassword() {
-            var passwordInput = document.getElementById('userPasswordInput');
-            var toggleBtn = document.querySelector('.password-toggle');
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleBtn.textContent = '🙈';
-            } else {
-                passwordInput.type = 'password';
-                toggleBtn.textContent = '👁️';
-            }
-        }
-
         function isVlad(name) {
             var vladVariations = ['влад', 'vlad', 'владик', 'владушка', 'владюша', 'владочка'];
             var lowerName = name.toLowerCase();
@@ -339,9 +281,8 @@
             });
         }
 
-        // 🔥 ЗАПРЕЩЁННЫЕ ИМЕНА (admin и похожие)
         function isAdminName(name) {
-            // 🔥 РАЗРЕШАЕМ admin123 (секретный код админа)            if (name.indexOf(':' + SECRET_ADMIN_CODE) !== -1) {
+            if (name.indexOf(':' + SECRET_ADMIN_CODE) !== -1) {
                 return false;
             }
             
@@ -351,7 +292,6 @@
                 return lowerName === variation || lowerName.indexOf(variation) !== -1;
             });
         }
-
         function getProfileCount() {
             var profiles = localStorage.getItem('bottleProfiles');
             return profiles ? JSON.parse(profiles).length : 0;
@@ -383,27 +323,11 @@
         function login() {
             hideError();
             var input = document.getElementById('userNameInput').value.trim();
-            var password = document.getElementById('userPasswordInput').value.trim();
-            var rememberMe = document.getElementById('rememberPassword').checked;
             
             if (!input) { showError('Введите имя!'); return; }
-            if (!password) { showError('Введите пароль!'); return; }
             
-            // 🔥 ПРОВЕРКА НА ЗАПРЕЩЁННОЕ ИМЯ (admin)
-            if (isAdminName(input)) {                showError('❌ Некорректное имя! Выберите другое.');
-                return;
-            }
-            
-            // 🔥 ПРОВЕРКА ПАРОЛЯ (мин. 5 символов, кроме админа)
-            var isAdminLogin = (input.indexOf(':' + SECRET_ADMIN_CODE) !== -1);
-            if (!isAdminLogin && password.length < 5) {
-                showError('Пароль должен быть не менее 5 символов!');
-                return;
-            }
-            
-            // 🔥 АДМИН ДОЛЖЕН ВВЕСТИ ПАРОЛЬ "1"
-            if (isAdminLogin && password !== ADMIN_PASSWORD) {
-                showError('❌ Неверный пароль админа!');
+            if (isAdminName(input)) {
+                showError('❌ Некорректное имя! Выберите другое.');
                 return;
             }
             
@@ -413,21 +337,11 @@
                 return;
             }
             
-            isAdmin = isAdminLogin;
+            isAdmin = (input.indexOf(':' + SECRET_ADMIN_CODE) !== -1);
             var displayName;
             if (isAdmin) {
                 displayName = input.split(':')[0];
-            } else {
-                displayName = input;
-            }
-            
-            // 🔥 СОХРАНЯЕМ ПАРОЛЬ ЕСЛИ ЗАПОМНИТЬ
-            if (rememberMe) {
-                localStorage.setItem('bottleSavedPassword', password);
-                localStorage.setItem('bottleRememberPassword', 'true');
-            } else {
-                localStorage.removeItem('bottleSavedPassword');
-                localStorage.removeItem('bottleRememberPassword');
+            } else {                displayName = input;
             }
             
             document.getElementById('loginScreen').style.display = 'none';
@@ -439,7 +353,8 @@
                 vladMessage.style.display = 'block';
             } else if (vladMessage) {
                 vladMessage.style.display = 'none';
-            }            
+            }
+            
             var progress = 0;
             var loadingBar = document.getElementById('loadingBar');
             var loadingPercent = document.getElementById('loadingPercent');
@@ -454,13 +369,13 @@
                 if (progress >= 100) {
                     clearInterval(interval);
                     setTimeout(function() {
-                        checkAndLogin(displayName, input, password);
+                        checkAndLogin(displayName, input);
                     }, 500);
                 }
             }, 100);
         }
 
-        function checkAndLogin(displayName, fullInput, password) {
+        function checkAndLogin(displayName, fullInput) {
             var savedId = localStorage.getItem('bottleUserId');
             
             isNameTaken(displayName, savedId).then(function(taken) {
@@ -472,13 +387,10 @@
                 }
                 
                 currentUserName = displayName;
-                currentUserPassword = password;
                 currentUserId = savedId || Date.now().toString();
                 localStorage.setItem('bottleUserName', fullInput);
                 localStorage.setItem('bottleUserId', currentUserId);
-                localStorage.setItem('bottleUserPassword', password);
-                
-                var profiles = JSON.parse(localStorage.getItem('bottleProfiles') || '[]');
+                                var profiles = JSON.parse(localStorage.getItem('bottleProfiles') || '[]');
                 var existingIndex = profiles.findIndex(function(p) { return p.id === currentUserId; });
                 if (existingIndex === -1) {
                     profiles.push({
@@ -488,12 +400,12 @@
                     });
                     if (profiles.length > MAX_PROFILES) {
                         profiles.shift();
-                    }                    localStorage.setItem('bottleProfiles', JSON.stringify(profiles));
+                    }
+                    localStorage.setItem('bottleProfiles', JSON.stringify(profiles));
                 }
                 
                 db.ref('contributors/' + currentUserId).set({
                     name: currentUserName,
-                    password: password,
                     totalAmount: 0,
                     lastActive: Date.now()
                 }).then(function() {
@@ -527,8 +439,7 @@
             
             if (window.activeInterval) {
                 clearInterval(window.activeInterval);
-            }
-            
+            }            
             document.getElementById('loadingScreen').style.display = 'none';
             document.getElementById('topScreen').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'none';
@@ -537,7 +448,8 @@
             
             var adminSection = document.getElementById('adminSection');
             if (adminSection) {
-                adminSection.style.display = isAdmin ? 'block' : 'none';            }
+                adminSection.style.display = isAdmin ? 'block' : 'none';
+            }
             
             db.ref('totalAmount').on('value', function(snapshot) {
                 currentAmount = snapshot.val() !== null ? snapshot.val() : 0;
@@ -547,7 +459,9 @@
             
             userContributionRef = function(snapshot) {
                 var amount = snapshot.val() !== null ? snapshot.val() : 0;
-                updateContributionDisplay(amount);
+                // 🔥 УСТАНОВКА ЦЕЛЕВОГО ЗНАЧЕНИЯ ДЛЯ ПЛАВНОЙ АНИМАЦИИ
+                targetContribution = amount;
+                animateContributionSmooth();
             };
             
             db.ref('contributors/' + currentUserId + '/totalAmount').on('value', userContributionRef);
@@ -560,39 +474,70 @@
             }
         }
 
-        // 🔥 ПЛАВНОЕ ОБНОВЛЕНИЕ ВКЛАДА
-        function updateContributionDisplay(amount) {
+        // 🔥 ОЧЕНЬ ПЛАВНАЯ АНИМАЦИЯ ЧИСЕЛ
+        function animateContributionSmooth() {
             var contributionEl = document.getElementById('currentUserContribution');
+            var now = Date.now();
             
-            if (changeTimeout) {
-                clearTimeout(changeTimeout);
-            }
+            // Минимум 100ms между анимациями чтобы не лагало
+            if (now - lastAnimationTime < 100) {
+                if (animationFrame) {
+                    cancelAnimationFrame(animationFrame);
+                }
+                animationFrame = requestAnimationFrame(function() {
+                    animateContributionSmooth();
+                });
+                return;
+            }            
+            lastAnimationTime = now;
             
-            changeTimeout = setTimeout(function() {
-                contributionEl.textContent = amount;
+            var startValue = currentContribution;
+            var endValue = targetContribution;
+            var duration = 400; // 400ms для плавности
+            var startTime = null;
+            
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                var elapsed = timestamp - startTime;
+                var progress = Math.min(elapsed / duration, 1);
                 
-                // Анимация изменения
-                if (amount !== lastContributionAmount) {
-                    contributionEl.classList.add('changed');
-                    setTimeout(function() {
-                        contributionEl.classList.remove('changed');
-                    }, 300);
+                // 🔥 ПЛАВНЫЙ EASING (ease-out cubic)
+                var easeProgress = 1 - Math.pow(1 - progress, 3);
+                
+                var currentValue = Math.round(startValue + (endValue - startValue) * easeProgress);
+                contributionEl.textContent = currentValue;
+                
+                // Обновляем цвет
+                contributionEl.classList.remove('negative', 'positive');
+                if (currentValue < 0) {
+                    contributionEl.classList.add('negative');
+                } else if (currentValue > 0) {
+                    contributionEl.classList.add('positive');
                 }
                 
-                lastContributionAmount = amount;
-            }, 50);
+                if (progress < 1) {
+                    animationFrame = requestAnimationFrame(step);
+                } else {
+                    currentContribution = endValue;
+                }
+            }
+            
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+            }
+            animationFrame = requestAnimationFrame(step);
         }
 
         function deleteContributor(userId, userName) {
             if (confirm('🗑️ Удалить "' + userName + '" из списка?')) {
                 db.ref('contributors/' + userId).remove().then(function() {
-                    if (userId === currentUserId) {                        setTimeout(function() { location.reload(); }, 1000);
+                    if (userId === currentUserId) {
+                        setTimeout(function() { location.reload(); }, 1000);
                     }
                 }).catch(function(error) {
                     alert('❌ Ошибка: ' + error.message);
                 });
-            }
-        }
+            }        }
 
         function loadTopList() {
             db.ref('contributors').once('value', function(snapshot) {
@@ -635,22 +580,20 @@
                     html += '</div>';
                 });
                 
-                listDiv.innerHTML = html;            });
+                listDiv.innerHTML = html;
+            });
         }
 
         function changeUser() {
             toggleMenu();
-            if (confirm('🔄 Сменить пользователя?')) {
-                if (window.activeInterval) {
+            if (confirm('🔄 Сменить пользователя?')) {                if (window.activeInterval) {
                     clearInterval(window.activeInterval);
                 }
                 
                 localStorage.removeItem('bottleUserName');
                 localStorage.removeItem('bottleUserId');
-                localStorage.removeItem('bottleUserPassword');
                 currentUserName = '';
                 currentUserId = null;
-                currentUserPassword = '';
                 isAdmin = false;
                 
                 if (userContributionRef) {
@@ -671,7 +614,6 @@
                 }
                 localStorage.removeItem('bottleUserName');
                 localStorage.removeItem('bottleUserId');
-                localStorage.removeItem('bottleUserPassword');
                 localStorage.removeItem('bottleProfiles');
                 location.reload();
             }
@@ -685,6 +627,7 @@
                 });
             }
         }
+
         function clearContributors() {
             if (confirm('⚠️ Удалить всех участников?')) {
                 db.ref('contributors').remove().then(function() {
@@ -692,7 +635,6 @@
                 });
             }
         }
-
         function updateDisplay() {
             var progressFill = document.getElementById('progressFill');
             var progressText = document.getElementById('progressText');
@@ -700,18 +642,26 @@
             
             progressText.textContent = formatNumber(currentAmount);
             
-            var percentage = currentAmount >= targetAmount ? 100 : currentAmount <= 0 ? 0 : (currentAmount / targetAmount) * 100;
+            // 🔥 РАСЧЁТ ПРОЦЕНТА С УЧЁТОМ ОТРИЦАТЕЛЬНЫХ ЗНАЧЕНИЙ ДО -11111
+            var percentage;
             
             if (currentAmount < 0) {
-                percentage = Math.min(100, (Math.abs(currentAmount) / negativeMax) * 100);
+                // От -11111 до 0 = 0% до 50%
+                percentage = (Math.abs(currentAmount) / negativeMax) * 50;
+                percentage = Math.min(50, percentage);
                 progressFill.classList.add('negative');
                 status.textContent = '📉 Долг: ' + Math.abs(currentAmount) + '₽';
             } else if (currentAmount < targetAmount) {
+                // От 0 до 1000 = 0% до 100%
+                percentage = (currentAmount / targetAmount) * 100;
                 progressFill.classList.remove('negative');
                 status.textContent = '📈 Осталось: ' + (targetAmount - currentAmount) + '₽';
             } else if (currentAmount >= maxDisplay) {
+                percentage = 100;
                 status.textContent = '🚀 БЕСКОНЕЧНОСТЬ!';
             } else {
+                // Больше 1000
+                percentage = 100;
                 progressFill.classList.remove('negative');
                 status.textContent = '✅ Цель достигнута! +' + (currentAmount - targetAmount) + '₽';
             }
@@ -732,10 +682,9 @@
                 return;
             }
             
-            // 🔥 ПЛАВНОЕ ОБНОВЛЕНИЕ (debounce 150ms)
-            if (updateTimeout) {                clearTimeout(updateTimeout);
-            }
-            
+            if (updateTimeout) {
+                clearTimeout(updateTimeout);
+            }            
             updateTimeout = setTimeout(function() {
                 db.ref('totalAmount').set(newTotalAmount);
                 if (currentUserId) {
