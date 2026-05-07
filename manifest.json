@@ -1,0 +1,8 @@
+{
+  "short_name": "Сбор Влада",
+  "name": "Сбор на бутылку Владу",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#22c55e",
+  "background_color": "#ffffff"
+}
